@@ -1,0 +1,20 @@
+FROM python:3.11-slim
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends iproute2 iputils-ping tzdata procps && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install c104==2.2.1
+
+COPY docker/init.sh /gns3/init.sh
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh /gns3/init.sh
+COPY docker/rtu.py /app/rtu.py
+COPY datasets/dataset_rtu1.json /data/dataset.json
+WORKDIR /app
+
+ENV HOST_IP=10.0.0.12
+ENV DATASET=/data/dataset.json
+ENV CA=1
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["python", "rtu.py"]

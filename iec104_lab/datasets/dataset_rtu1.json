@@ -1,0 +1,14 @@
+[
+  { "ioa": 11,  "value": true  },
+  { "ioa": 12,  "value": false },
+  { "ioa": 13,  "value": true  },
+  { "ioa": 14,  "value": false },
+  { "ioa": 15,  "value": true  },
+
+  { "ioa": 101, "value": false },
+  { "ioa": 102, "value": true  },
+  { "ioa": 103, "value": false },
+
+  { "ioa": 201, "value": true  },
+  { "ioa": 202, "value": false }
+]
