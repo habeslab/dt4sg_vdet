@@ -1,14 +1,14 @@
 [
-  { "ioa": 31,  "value": false },
-  { "ioa": 32,  "value": true  },
-  { "ioa": 33,  "value": false },
-  { "ioa": 34,  "value": true  },
-  { "ioa": 35,  "value": false },
+  { "ioa": 31,  "type": "SP", "init": 0, "toggle_sec": 10 },
+  { "ioa": 32,  "type": "SP", "init": 1, "toggle_sec": 10 },
+  { "ioa": 33,  "type": "SP", "init": 0, "toggle_sec": 10 },
+  { "ioa": 34,  "type": "SP", "init": 1, "toggle_sec": 10 },
+  { "ioa": 35,  "type": "SP", "init": 0, "toggle_sec": 10 },
 
-  { "ioa": 131, "value": true  },
-  { "ioa": 132, "value": false },
-  { "ioa": 133, "value": true  },
+  { "ioa": 131, "type": "SP", "init": 1, "toggle_sec": 10 },
+  { "ioa": 132, "type": "SP", "init": 0, "toggle_sec": 10 },
+  { "ioa": 133, "type": "SP", "init": 1, "toggle_sec": 10 },
 
-  { "ioa": 231, "value": false },
-  { "ioa": 232, "value": true  }
+  { "ioa": 231, "type": "SP", "init": 0, "toggle_sec": 10 },
+  { "ioa": 232, "type": "SP", "init": 1, "toggle_sec": 10 }
 ]
