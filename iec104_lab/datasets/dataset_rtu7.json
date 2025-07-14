@@ -1,0 +1,13 @@
+[
+  { "ioa": 1001, "type": "SP", "init": 0,    "toggle_sec": 12 },
+  { "ioa": 1002, "type": "SP", "init": 1,    "toggle_sec": 18 },
+  { "ioa": 1003, "type": "SP", "init": 0,    "toggle_sec": 24 },
+  { "ioa": 1004, "type": "SP", "init": 1,    "toggle_sec": 30 },
+
+  { "ioa": 1101, "type": "AN", "init": 400.0,"ampl": 50.0, "period_sec": 60 },
+  { "ioa": 1102, "type": "AN", "init":  32.0,"ampl":  8.0, "period_sec": 45 },
+  { "ioa": 1103, "type": "AN", "init":   7.0,"ampl":  2.0, "period_sec": 30 },
+  { "ioa": 1104, "type": "AN", "init":   3.5,"ampl":  1.0, "period_sec": 20 },
+  { "ioa": 1105, "type": "AN", "init":  50.0,"ampl": 10.0, "period_sec": 90 },
+  { "ioa": 1106, "type": "AN", "init":  25.0,"ampl":  5.0, "period_sec": 75 }
+]

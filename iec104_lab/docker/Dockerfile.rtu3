@@ -5,26 +5,16 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     pip install c104==2.2.1
 
-COPY docker/init.sh /gns3/init.sh
-COPY docker/entrypoint.sh /entrypoint.sh
+# file di servizio
+COPY docker/init.sh        /gns3/init.sh
+COPY docker/entrypoint.sh  /entrypoint.sh
 RUN chmod +x /entrypoint.sh /gns3/init.sh
 
+# simulatore e dataset
 COPY docker/substation_simulator.py /app/substation_simulator.py
-COPY datasets/dataset_rtu2.json  /data/dataset.json
+COPY datasets/dataset_rtu3.json     /data/dataset.json   
+
 WORKDIR /app
-
-ENV CA=2
-ENV DATASET=/data/dataset.json
-ENV FACTORY=1   
-ENV HOST_IP=10.0.0.13
-
+ENV CA=3 HOST_IP=10.0.0.14 FACTORY=1 DATASET=/data/dataset.json
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["python", "substation_simulator.py"]
-
-
-
-
-
-
-
-

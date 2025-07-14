@@ -1,0 +1,13 @@
+[
+  { "ioa": 301, "type": "AN", "init": 120.0, "ampl":  5.0, "period_sec":  60 },
+  { "ioa": 302, "type": "AN", "init":  23.5, "ampl":  3.0, "period_sec": 120 },
+  { "ioa": 303, "type": "AN", "init":  48.0, "ampl":  7.0, "period_sec":  90 },
+  { "ioa": 304, "type": "AN", "init":  11.5, "ampl":  1.5, "period_sec":  45 },
+  { "ioa": 305, "type": "AN", "init":   5.5, "ampl":  1.0, "period_sec":  30 },
+  { "ioa": 306, "type": "AN", "init":  75.0, "ampl": 15.0, "period_sec": 180 },
+  { "ioa": 307, "type": "AN", "init":   0.98, "ampl": 0.02,"period_sec":  15 },
+  { "ioa": 308, "type": "AN", "init":  20.0, "ampl":  4.0, "period_sec":  75 },
+  { "ioa": 309, "type": "AN", "init": 101.0, "ampl":  6.0, "period_sec": 105 },
+  { "ioa": 310, "type": "AN", "init":  30.0, "ampl":  5.0, "period_sec":  50 }
+]
+

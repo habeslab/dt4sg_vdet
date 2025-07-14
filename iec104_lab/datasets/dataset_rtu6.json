@@ -1,0 +1,15 @@
+[
+  { "ioa": 801, "type": "SP", "init": 1, "toggle_sec": 15 },
+  { "ioa": 802, "type": "SP", "init": 0, "toggle_sec": 20 },
+  { "ioa": 803, "type": "SP", "init": 1, "toggle_sec": 25 },
+  { "ioa": 804, "type": "SP", "init": 0, "toggle_sec": 30 },
+  { "ioa": 805, "type": "SP", "init": 1, "toggle_sec": 35 },
+  { "ioa": 806, "type": "SP", "init": 0, "toggle_sec": 40 },
+
+  { "ioa": 901, "type": "AN", "init": 230.0, "ampl": 12.0, "period_sec": 60 },
+  { "ioa": 902, "type": "AN", "init":  55.0, "ampl":  5.0, "period_sec": 45 },
+  { "ioa": 903, "type": "AN", "init":  75.0, "ampl": 15.0, "period_sec": 90 },
+  { "ioa": 904, "type": "AN", "init":  12.0, "ampl":  2.0, "period_sec": 30 },
+  { "ioa": 905, "type": "AN", "init": 310.0, "ampl": 20.0, "period_sec":120 },
+  { "ioa": 906, "type": "AN", "init":  80.0, "ampl": 10.0, "period_sec":150 }
+]

@@ -1,0 +1,17 @@
+[
+  { "ioa": 401, "type": "SP", "init": 0, "toggle_sec": 20 },
+  { "ioa": 402, "type": "SP", "init": 1, "toggle_sec": 25 },
+  { "ioa": 403, "type": "SP", "init": 0, "toggle_sec": 30 },
+  { "ioa": 404, "type": "SP", "init": 1, "toggle_sec": 35 },
+  { "ioa": 405, "type": "SP", "init": 0, "toggle_sec": 40 },
+  { "ioa": 406, "type": "SP", "init": 1, "toggle_sec": 45 },
+  { "ioa": 407, "type": "SP", "init": 0, "toggle_sec": 50 },
+  { "ioa": 408, "type": "SP", "init": 1, "toggle_sec": 55 },
+
+  { "ioa": 501, "type": "CT", "init": 10000, "inc": 100,  "period_sec": 60 },
+  { "ioa": 502, "type": "CT", "init":  8000, "inc":  80,  "period_sec": 45 },
+  { "ioa": 503, "type": "CT", "init":  6000, "inc":  60,  "period_sec": 30 },
+  { "ioa": 504, "type": "CT", "init":  4000, "inc":  40,  "period_sec": 90 },
+  { "ioa": 505, "type": "CT", "init":  2000, "inc":  20,  "period_sec":120 },
+  { "ioa": 506, "type": "CT", "init":   500, "inc":  10,  "period_sec":150 }
+]

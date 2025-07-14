@@ -1,0 +1,16 @@
+[
+  { "ioa": 601, "type": "AN", "init":  10.0, "ampl":  3.0, "period_sec":  30 },
+  { "ioa": 602, "type": "AN", "init":  20.0, "ampl":  5.0, "period_sec":  60 },
+  { "ioa": 603, "type": "AN", "init":  15.0, "ampl":  4.0, "period_sec":  45 },
+  { "ioa": 604, "type": "AN", "init":  25.0, "ampl":  6.0, "period_sec":  90 },
+  { "ioa": 605, "type": "AN", "init":   1.0, "ampl":  0.2, "period_sec":  15 },
+  { "ioa": 606, "type": "AN", "init":  75.0, "ampl": 10.0, "period_sec": 120 },
+  { "ioa": 607, "type": "AN", "init":   0.50,"ampl": 0.05,"period_sec":  10 },
+  { "ioa": 608, "type": "AN", "init":   0.60,"ampl": 0.06,"period_sec":  20 },
+
+  { "ioa": 701, "type": "CT", "init":  5000, "inc": 50,  "period_sec": 50 },
+  { "ioa": 702, "type": "CT", "init": 10000, "inc":100, "period_sec": 70 },
+  { "ioa": 703, "type": "CT", "init": 15000, "inc":150, "period_sec": 90 },
+  { "ioa": 704, "type": "CT", "init": 20000, "inc":200, "period_sec":110 },
+  { "ioa": 705, "type": "CT", "init": 25000, "inc":250, "period_sec":130 }
+]
