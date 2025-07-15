@@ -1,92 +1,96 @@
 #!/usr/bin/env python3
 """
-Master IEC-104 con libreria «c104».
-• Si collega agli RTU indicati in $PEERS
-• Quando la connessione diventa OPEN invia la GI
-• Stampa ogni valore ricevuto
+IEC-104 Master – compat. c104-python 2.2.1
+• General Interrogation all’apertura
+• TESTFR ogni 25 s (senza time-tag, Type 104)
 """
-import os, time, threading, c104
-from c104 import (Client, ResponseState, Station, Coi,
-                  ConnectionState, Type, Connection, IncomingMessage)
+import os, time, threading, logging, c104
 
-# ─── Configurazione RTU ─────────────────────────────────────────
-# Lista di peer predefinita (modifica includendo nuovi RTU)
+# ── configurazione ───────────────────────────────────────────
 PEERS = os.getenv(
     "PEERS",
     "10.0.0.12 10.0.0.13 10.0.0.14 10.0.0.15 10.0.0.16 10.0.0.17 10.0.0.18"
 ).split()
-POLL_SEC = int(os.getenv("POLL_SEC", "30"))
 if not PEERS:
-    raise SystemExit("PEERS vuoto (es: PEERS='10.0.0.12 10.0.0.13 ...')")
+    raise SystemExit("PEERS is empty")
 
-print(f"[MASTER] avviato – PEERS={PEERS}")
+logging.basicConfig(level=os.getenv("LOGLEVEL", "INFO").upper(),
+                    format="%(asctime)s %(levelname)s %(message)s",
+                    datefmt="%H:%M:%S")
+# opzionale: silenzia eventuali warn interni della libreria
+logging.getLogger("c104.IncomingMessage").setLevel(logging.ERROR)
 
-# Mappa Common Address (CA) per ogni RTU IP
-CA_MAP = {
-    "10.0.0.12": 1,   # RTU_Power
-    "10.0.0.13": 2,   # RTU_Factory
-    "10.0.0.14": 3,   # RTU_Suburb
-    "10.0.0.15": 4,   # RTU_Solar
-    "10.0.0.16": 5,   # RTU_Wind
-    "10.0.0.17": 6,   # RTU_Industry
-    "10.0.0.18": 7    # RTU_EV
-}
+log = logging.getLogger("MASTER")
 
-# ─── Inizializza client IEC-104 ─────────────────────────────────
-client = Client(tick_rate_ms=100)
+CA_MAP = {ip: i + 1 for i, ip in enumerate(PEERS)}     # CA 1-7
+client  = c104.Client(tick_rate_ms=100)
 
-# Callback per ogni punto ricevuto
-def _print_point(point: c104.Point,
-                 previous_info: c104.Information,
-                 message: IncomingMessage) -> ResponseState:
+# ── utilità --------------------------------------------------
+def pretty(pt: c104.Point):
+    if pt.type.name.startswith("M_SP"):
+        return "ON" if pt.value else "OFF"
+    if pt.type.name.startswith("M_ME"):
+        return f"{pt.value:.2f}"
+    return pt.value
+
+def on_point(point:        c104.Point,
+             previous_info: c104.Information,
+             message:       c104.IncomingMessage) -> c104.ResponseState:
+    ca   = point.station.common_address
     conn = point.station.connection
-    source_ip = conn.ip if conn else "unknown"
-    print(
-        f"[MASTER] {source_ip} ioa={point.io_address} "
-        f"→ {int(point.value)}"
-    )
-    return ResponseState.SUCCESS
+    log.info("CA=%d IOA=%d %s → %s",
+             ca, point.io_address,
+             conn.ip if conn else "-", pretty(point))
+    return c104.ResponseState.SUCCESS
 
-# Registrazione callback all'avvio di ogni station
-def on_station_initialized(client: Client, station: Station, cause: Coi) -> None:
+# ── keep-alive TESTFR (senza time-tag) ----------------------
+def keepalive(con: c104.Connection, ca: int):
+    while con.state == c104.ConnectionState.OPEN:
+        time.sleep(25)
+        try:
+            con.test(common_address=ca, with_time=False,   # ← patch
+                     wait_for_response=False)
+        except Exception as exc:
+            log.warning("TESTFR %s: %s", con.ip, exc)
+
+# ── stato connessione --------------------------------------
+def handle_state(connection: c104.Connection,
+                 state:      c104.ConnectionState) -> None:
+    if state == c104.ConnectionState.OPEN:
+        ca = CA_MAP.get(connection.ip, 0)
+        log.info("%s OPEN – GI CA=%d", connection.ip, ca)
+        connection.interrogation(common_address=ca)
+        threading.Thread(target=keepalive,
+                         args=(connection, ca),
+                         daemon=True).start()
+
+# ── init stazione & punti dinamici -------------------------
+def on_station_initialized(client:  c104.Client,
+                           station: c104.Station,
+                           cause:   c104.Coi) -> None:
     for p in station.points.values():
-        p.on_receive(callable=_print_point)
+        p.on_receive(callable=on_point)
 client.on_station_initialized(on_station_initialized)
 
-# Callback per nuovi punti dinamici
-def on_new_point(client: Client, station: Station,
-                 io_address: int, point_type: Type) -> None:
+def on_new_point(client:    c104.Client,
+                 station:   c104.Station,
+                 io_address:int,
+                 point_type:c104.Type) -> None:
     p = station.add_point(io_address=io_address, type=point_type)
-    p.on_receive(callable=_print_point)
+    p.on_receive(callable=on_point)
 client.on_new_point(on_new_point)
 
-# ─── Connessione e polling ciclico ───────────────────────────────
-def connect_and_poll(ip: str):
-    ca = CA_MAP.get(ip, 1)
-    con = client.add_connection(ip=ip, port=2404, init=c104.Init.NONE)
-
-    # Invia General Interrogation all'apertura della connessione
-    def on_state_change(connection: Connection, state: ConnectionState) -> None:
-        if state == ConnectionState.OPEN:
-            print(f"[MASTER] {ip} OPEN – GI CA={ca}")
-            connection.interrogation(common_address=ca)
-    con.on_state_change(callable=on_state_change)
-
-    con.connect()
-    # Polling ciclico
-    while True:
-        con.interrogation(common_address=ca)
-        time.sleep(POLL_SEC)
-
-# Avvia client e thread di connessione per ciascun RTU
-client.start()
+# ── apertura connessioni -----------------------------------
 for ip in PEERS:
-    threading.Thread(
-        target=connect_and_poll,
-        args=(ip,),
-        daemon=True
-    ).start()
+    con = client.add_connection(ip=ip, port=2404, init=c104.Init.NONE)
+    con.on_state_change(handle_state)
+    con.connect()
 
-# Mantieni il processo attivo
-while True:
-    time.sleep(3600)
+client.start()
+
+try:
+    while True:
+        time.sleep(3600)
+except KeyboardInterrupt:
+    client.stop()
+    log.info("Master stopped")
