@@ -1,0 +1,42 @@
+# docker/Dockerfile.ids  - Suricata 7 + tool di rete + capability NET_RAW/NET_ADMIN
+# ------------------------------------------------------------
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+USER root
+
+# 1) Rendi il sistema pronto (https + add-apt-repository)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      software-properties-common ca-certificates gnupg curl
+
+# 2) Aggiungi il PPA Suricata-stable (7.x)
+RUN add-apt-repository -y ppa:oisf/suricata-stable
+
+# 3) Installa Suricata e i tool di rete desiderati
+#    gping è già nei repo universe di 24.04 (versione 1.16)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      suricata \
+      tcpdump \
+      hping3 \
+      gping \
+      iproute2 \
+      iputils-ping \
+      nano less \
+      libcap2-bin && \
+    rm -rf /var/lib/apt/lists/*
+
+# 4) Directory regole e configurazione
+RUN mkdir -p /etc/suricata/rules
+COPY docker/suricata.yaml              /etc/suricata/suricata.yaml
+COPY docker/rules/whitelist.rules      /etc/suricata/rules/whitelist.rules
+COPY docker/rules/iec104.rules         /etc/suricata/rules/iec104.rules
+COPY docker/entrypoint_ids.sh          /entrypoint_ids.sh
+RUN chmod +x /entrypoint_ids.sh
+
+# 5) Capability permanenti sul binario Suricata
+RUN setcap 'cap_net_raw,cap_net_admin+eip' /usr/bin/suricata
+
+
+ENTRYPOINT ["/entrypoint_ids.sh"]

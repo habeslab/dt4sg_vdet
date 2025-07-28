@@ -1,0 +1,2 @@
+# Traffico IEC-104 lecito: Master (10.0.0.11)  →  RTU (porta 2404/TCP)
+pass tcp $MASTER any -> $RTU_SET 2404 (msg:"IEC104 – traffico legittimo Master→RTU"; flow:to_server; sid:10; rev:3;)

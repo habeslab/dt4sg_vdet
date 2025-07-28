@@ -1,0 +1,22 @@
+FROM kalilinux/kali-rolling
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        iproute2 iputils-ping net-tools dnsutils \
+        curl wget nano vim-tiny less jq tcpdump tshark \
+        nmap masscan hping3 netcat-traditional \
+        hydra medusa patator metasploit-framework \
+        nikto whatweb feroxbuster dirb wfuzz \
+        gobuster seclists wordlists \
+        mbpoll                       \  
+        python3 python3-pip python3-scapy \
+        python3-requests python3-rich \
+        impacket-scripts \
+        && \
+    pip3 install --no-cache-dir --break-system-packages \
+        pymodbus modbus-tk rich && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+CMD ["/bin/bash"]

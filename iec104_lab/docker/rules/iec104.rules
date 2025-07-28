@@ -1,0 +1,11 @@
+# 1000101 – SYN-flood (≥20 SYN/s) verso le RTU
+drop tcp any any -> $RTU_SET 2404 (msg:"IEC104 – SYN flood (≥20 SYN/s)"; flags:S; flow:to_server,stateless; threshold:type both, track by_dst, count 20, seconds 1; classtype:attempted-dos; sid:1000101; rev:8;)
+
+# 1100101 – ASDU 100 manipolato (flag PA senza handshake)
+drop tcp any any -> $RTU_SET 2404 (msg:"IEC104 – ASDU 100 manipolato (flag PA senza handshake)"; flow:to_server,established; content:"|64 00|"; depth:2; offset:0; classtype:attempted-recon; sid:1100101; rev:5;)
+
+# 1200101 – host interno non autorizzato (≠Master) che tenta la connessione
+drop tcp any any -> $RTU_SET 2404 (msg:"IEC104 – host interno non autorizzato"; flags:S; flow:to_server,stateless; classtype:attempted-recon; sid:1200101; rev:4;)
+
+# 1200201 – host esterno alla subnet SCADA che tenta la connessione
+drop tcp !$SCADA_NET any -> $RTU_SET 2404 (msg:"IEC104 – host esterno alla subnet tenta la connessione"; flags:S; flow:to_server,stateless; classtype:attempted-recon; sid:1200201; rev:3;)

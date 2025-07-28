@@ -1,0 +1,86 @@
+%YAML 1.1
+---
+###############################################################################
+# Suricata – inline IPS (AF_PACKET pair)
+###############################################################################
+
+vars:
+  address-groups:
+    MASTER: "[10.0.0.11]"
+
+    # 7 RTU
+    RTU_SET: "[10.0.0.12,10.0.0.13,10.0.0.14,10.0.0.15,10.0.0.16,10.0.0.17,10.0.0.18]"
+
+    SCADA_NET: "[10.0.0.0/24]"
+    HOME_NET:  "$SCADA_NET"
+    EXTERNAL_NET: "!$HOME_NET"    # tenuto per future regole
+
+###############################################################################
+# AF-PACKET IPS pair (eth0 ↔ eth1)
+###############################################################################
+af-packet:
+  - interface: eth0
+    threads: 8
+    cluster-id: 99
+    cluster-type: cluster_flow
+    copy-mode: ips
+    copy-iface: eth1
+
+  - interface: eth1
+    threads: 8
+    cluster-id: 98
+    cluster-type: cluster_flow
+    copy-mode: ips
+    copy-iface: eth0
+
+#########################
+# Application-layer parsers
+#########################
+app-layer:
+  protocols:
+    - tls
+    - dns
+    - http
+    - smtp
+    - modbus
+    - dnp3          # IEC-104 non ancora supportato
+
+###############################################################################
+# Rule-set
+###############################################################################
+default-rule-path: /etc/suricata/rules
+rule-files:
+  - whitelist.rules
+  - iec104.rules
+
+###############################################################################
+# Outputs
+###############################################################################
+outputs:
+  - fast:
+      enabled: yes
+      filename: /var/log/suricata/fast.log
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: /var/log/suricata/eve.json
+      types: [alert, drop, flow]
+
+###############################################################################
+# Detection engine
+###############################################################################
+detect:
+  enable-protocols: [tcp, udp]
+
+###############################################################################
+# Suricata-SC Unix socket
+###############################################################################
+unix-command:
+  enabled: yes
+  filename: /var/run/suricata/suricata-command.socket
+
+###############################################################################
+# Default log directory
+###############################################################################
+logging:
+  default-log-dir: /var/log/suricata
