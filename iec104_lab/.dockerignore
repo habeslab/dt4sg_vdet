@@ -1,0 +1,4 @@
+# ignora tutto tranne la cartella docker/
+*
+!docker/
+!docker/**

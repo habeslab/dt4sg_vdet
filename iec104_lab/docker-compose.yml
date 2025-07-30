@@ -1,0 +1,157 @@
+version: "3.8"
+services:
+  ids:
+    image: iec104_lab_ids:latest
+    container_name: iec104_lab_ids-1
+    network_mode: host           
+    cap_add:                     
+      - NET_RAW
+      - NET_ADMIN
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "1"   
+    volumes:
+      - ./docker/suricata.yaml:/etc/suricata/suricata.yaml:ro
+      - ./docker/rules:/etc/suricata/rules:ro
+    environment:
+
+      SURICATA_OPTIONS: "--set vars.af-packet.defrag=no"
+
+  master:
+    container_name: master_node
+    hostname: Master
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.masterr
+    environment:
+      - HOST_IP=10.0.0.11
+      - PEERS="10.0.0.12 10.0.0.13 10.0.0.14 10.0.0.15 10.0.0.16 10.0.0.17 10.0.0.18"
+    networks:
+      - ot_net
+
+  # --------------------------------------------------------------------
+  # RTU Power Plant
+  # --------------------------------------------------------------------
+  rtu_power:
+    container_name: RTU_Power
+    hostname: RTU_Power
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.rtu1
+    environment:
+      - HOST_IP=10.0.0.12
+      - CA=1
+      - DATASET=/data/dataset.json
+      - FACTORY=1
+    networks:
+      - rtu_net
+
+  # --------------------------------------------------------------------
+  # RTU Factory
+  # --------------------------------------------------------------------
+  rtu_factory:
+    container_name: RTU_Factory
+    hostname: RTU_Factory
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.rtu2
+    environment:
+      - HOST_IP=10.0.0.13
+      - CA=2
+      - DATASET=/data/dataset.json
+      - FACTORY=1
+    networks:
+      - rtu_net
+
+  # --------------------------------------------------------------------
+  # RTU Suburb
+  # --------------------------------------------------------------------
+  rtu_suburb:
+    container_name: RTU_Suburb
+    hostname: RTU_Suburb
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.rtu3
+    environment:
+      - HOST_IP=10.0.0.14
+      - CA=3
+      - DATASET=/data/dataset.json
+      - FACTORY=1
+    networks:
+      - rtu_net
+
+  # --------------------------------------------------------------------
+  # RTU Solar Farm
+  # --------------------------------------------------------------------
+  rtu_solar:
+    container_name: RTU_Solar
+    hostname: RTU_Solar
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.rtu4
+    environment:
+      - HOST_IP=10.0.0.15
+      - CA=4
+      - DATASET=/data/dataset.json
+      - FACTORY=1
+    networks:
+      - rtu_net
+
+  # --------------------------------------------------------------------
+  # RTU Wind Park
+  # --------------------------------------------------------------------
+  rtu_wind:
+    container_name: RTU_Wind
+    hostname: RTU_Wind
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.rtu5
+    environment:
+      - HOST_IP=10.0.0.16
+      - CA=5
+      - DATASET=/data/dataset.json
+      - FACTORY=1
+    networks:
+      - rtu_net
+
+  # --------------------------------------------------------------------
+  # RTU Industry (Prosumer)
+  # --------------------------------------------------------------------
+  rtu_industry:
+    container_name: RTU_Industry
+    hostname: RTU_Industry
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.rtu6
+    environment:
+      - HOST_IP=10.0.0.17
+      - CA=6
+      - DATASET=/data/dataset.json
+      - FACTORY=1
+    networks:
+      - rtu_net
+
+  # --------------------------------------------------------------------
+  # RTU EV Charging Station
+  # --------------------------------------------------------------------
+  rtu_ev:
+    container_name: RTU_EV
+    hostname: RTU_EV
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.rtu7
+    environment:
+      - HOST_IP=10.0.0.18
+      - CA=7
+      - DATASET=/data/dataset.json
+      - FACTORY=1
+    networks:
+      - rtu_net
+
+# --------------------------------------------------------------------
+# Reti per i container RTU e Master (IDS usa host network)
+# --------------------------------------------------------------------
+networks:
+  rtu_net:
+    driver: bridge
+  ot_net:
+    driver: bridge
