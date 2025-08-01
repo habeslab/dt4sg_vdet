@@ -27,7 +27,7 @@ The entire lab runs on **Docker Compose** (or can be imported into **GNS3**) an
 | **RTU Industry** | `rtu_industry` | 10.0.0.17 | Industrial prosumer (generates & consumes) |
 | **RTU EV** | `rtu_ev` | 10.0.0.18 | EV fast‑charging station |
 | **Suricata IDS** | `ids` (host net) | — | OT‑aware intrusion detection system |
-| **Attacker** | `attacker` | runtime | Kali‑like red‑team box for adversarial scenarios |
+| **Attacker** | `attacker` | 10.0.0.99 | Kali‑like red‑team box for adversarial scenarios |
 
 > **Topology** — see `iec104_lab/docs/topology.png` for an annotated diagram of VLANs, virtual switches and mirror ports.
 
