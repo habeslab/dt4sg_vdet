@@ -1,4 +1,7 @@
-# ignora tutto tranne la cartella docker/
 *
 !docker/
 !docker/**
+!datasets/
+!datasets/**
+!dataset_attack/
+!dataset_attack/**

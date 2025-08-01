@@ -1,20 +1,23 @@
 version: "3.8"
 services:
   ids:
-    image: iec104_lab_ids:latest
     container_name: iec104_lab_ids-1
-    network_mode: host           
-    cap_add:                     
+    image: iec104_lab_ids:latest      
+    build:
+      context: .              
+      dockerfile: docker/Dockerfile.ids      
+    network_mode: host
+    cap_add:
       - NET_RAW
       - NET_ADMIN
     sysctls:
-      net.ipv6.conf.all.disable_ipv6: "1"   
+      net.ipv6.conf.all.disable_ipv6: "1"
     volumes:
       - ./docker/suricata.yaml:/etc/suricata/suricata.yaml:ro
       - ./docker/rules:/etc/suricata/rules:ro
     environment:
-
       SURICATA_OPTIONS: "--set vars.af-packet.defrag=no"
+
 
   master:
     container_name: master_node
@@ -146,6 +149,21 @@ services:
       - FACTORY=1
     networks:
       - rtu_net
+
+  # --------------------------------------------------------------------
+  # NODO ATTACKER (test IDS + replay PCAP)
+  # --------------------------------------------------------------------
+  attacker:
+    container_name: attacker_node
+    build:
+      context: .                      
+      dockerfile: docker/Dockerfile.attacker
+    privileged: true                     
+    environment:
+      - ATTACKER_IP=10.0.0.99/24        
+    networks:
+      - rtu_net                          
+
 
 # --------------------------------------------------------------------
 # Reti per i container RTU e Master (IDS usa host network)

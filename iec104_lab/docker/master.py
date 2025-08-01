@@ -48,7 +48,7 @@ def keepalive(con: c104.Connection, ca: int):
     while con.state == c104.ConnectionState.OPEN:
         time.sleep(25)
         try:
-            con.test(common_address=ca, with_time=False,   # ← patch
+            con.test(common_address=ca, with_time=False,  
                      wait_for_response=False)
         except Exception as exc:
             log.warning("TESTFR %s: %s", con.ip, exc)

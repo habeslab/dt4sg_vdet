@@ -7,6 +7,7 @@ RUN apt-get update && \
         iproute2 iputils-ping net-tools dnsutils \
         curl wget nano vim-tiny less jq tcpdump tshark \
         nmap masscan hping3 netcat-traditional \
+        tcpreplay \
         hydra medusa patator metasploit-framework \
         nikto whatweb feroxbuster dirb wfuzz \
         gobuster seclists wordlists \
@@ -18,10 +19,11 @@ RUN apt-get update && \
         pymodbus modbus-tk rich && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY entrypoint_attacker.sh /entrypoint_attacker.sh
-COPY attack.sh /attack.sh
-
-RUN chmod +x /entrypoint_attacker.sh /attack.sh
+COPY docker/entrypoint_attacker.sh /entrypoint_attacker.sh
+COPY docker/attack.sh /attack.sh
+COPY docker/pcap_replayer.py /usr/local/bin/pcap_replayer.py
+COPY dataset_attack /data
+RUN chmod +x /entrypoint_attacker.sh /attack.sh /usr/local/bin/pcap_replayer.py
 
 ENTRYPOINT ["/entrypoint_attacker.sh"]
 CMD ["/bin/bash"]

@@ -9,7 +9,7 @@
 ## 1 – Build the images
 
     cd iec104_lab
-    docker compose build
+    docker-compose build --no-cache
 
 ## 2 – Register the Docker images with GNS3
 
@@ -48,3 +48,25 @@ Within a few seconds all containers should be online:
     # Stream Suricata logs live
     tail -f /var/log/suricata/eve.json
 
+## Launching Attack Scenarios
+
+The **attacker** container provides the control script `/attack.sh`,  
+which guides you through the available IEC-104 penetration tests.
+
+    docker compose exec attacker /attack.sh
+    # or, if the container name differs:
+    docker exec -it attacker_node /attack.sh
+
+### Menu options
+
+| Option | Scenario            | Operational details |
+|--------|---------------------|---------------------|
+| **1 – IDS test-suite** | *Synthetic attacks* | Generates three demonstration flows (lateral movement, external intrusion, SYN-flood) to validate the installed IDS/IPS rules. |
+| **2 – Automatic replay** | *Dataset playback* | Sequentially replays — preserving the original timing — **all** `*.pcap` files located in **/data**. The engine is dataset-agnostic: any **IEC-104 over TCP** capture placed in `/data` is detected and injected, with no constraints on file names or folder structure. |
+
+### Runtime parameters
+
+| Variable        | Default | Purpose |
+|-----------------|---------|---------|
+| `DELAY_FACTOR`  | `1.0`   | Timing scale for the replay (`0.5` = twice as fast, `2` = half-speed). |
+| `IFACE`         | `eth0`  | Network interface used by Scapy to transmit the frames. |
