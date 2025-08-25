@@ -1,0 +1,13 @@
+{
+  "features": [
+    "duration",
+    "packet_count",
+    "bytes_per_packet",
+    "packets_per_sec",
+    "iat_mean",
+    "syn_count",
+    "ack_count",
+    "rst_count",
+    "fin_count"
+  ]
+}

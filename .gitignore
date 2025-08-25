@@ -1,0 +1,59 @@
+# --- ignora tutto di default ---
+*
+
+# file sempre tracciati a livello root
+!.gitignore
+!/README.md
+!/requirements.txt
+
+# tieni il digital twin (se ti serve nel repo)
+!/iec104_lab/
+!/iec104_lab/**
+
+# --- sblocca il progetto GAN ---
+!/gan-ics/
+!/gan-ics/**
+
+# re-ignora cose pesanti/sensibili dentro gan-ics
+/gan-ics/dataset-maligno/**
+/gan-ics/pcaps-benigni/**
+/gan-ics/processed/**
+
+/gan-ics/artifacts/checkpoints/**
+/gan-ics/artifacts/logs/**
+/gan-ics/artifacts/plots/**
+
+# modelli/binari: fuori dal repo (o mettili su LFS/Release)
+/gan-ics/artifacts/models/**
+/gan-ics/artifacts/scaler.pkl
+
+# calibrazione: ignora l'istanza reale, traccia solo il template
+/gan-ics/artifacts/calibration_2c.json
+!/gan-ics/artifacts/calibration_2c.example.json
+
+# tieni sempre features.json (contratto delle 9 feature)
+!/gan-ics/artifacts/features.json
+
+# NON pushare ancora i nuovi container
+/gan-ics/disc-api/**
+/gan-ics/net-agent/**
+
+# rumore Python/venv in qualunque cartella già permessa
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+.env
+.env.*
+
+# pcap & archivi ovunque
+*.pcap
+*.pcapng
+*.zip
+*.tar
+*.tar.gz
+
+# consenti segnaposto nelle cartelle ignorate
+!/gan-ics/artifacts/models/.gitkeep
+!/gan-ics/artifacts/logs/.gitkeep
