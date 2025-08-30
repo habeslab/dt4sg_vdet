@@ -31,12 +31,7 @@
 /gan-ics/artifacts/calibration_2c.json
 !/gan-ics/artifacts/calibration_2c.example.json
 
-# tieni sempre features.json (contratto delle 9 feature)
-!/gan-ics/artifacts/features.json
 
-# NON pushare ancora i nuovi container
-/gan-ics/disc-api/**
-/gan-ics/net-agent/**
 
 # rumore Python/venv in qualunque cartella già permessa
 __pycache__/
