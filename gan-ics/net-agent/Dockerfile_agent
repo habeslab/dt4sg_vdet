@@ -1,0 +1,39 @@
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    iproute2 iputils-ping curl tcpdump libpcap0.8 busybox \
+    procps netcat-openbsd jq bind9-dnsutils traceroute mtr-tiny \
+    vim-tiny less \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY net-agent/agent /app/agent
+COPY net-agent/requirements.txt /app/requirements.txt
+COPY net-agent/entrypoint-agent.sh /usr/local/bin/entrypoint-agent.sh
+RUN chmod +x /usr/local/bin/entrypoint-agent.sh
+
+# Artifacts baked
+RUN mkdir -p /artifacts /data
+COPY out_pipeline/artifacts/features.json  /artifacts/features.json
+COPY out_pipeline/artifacts/scaler.pkl     /artifacts/scaler.pkl
+COPY out_pipeline/artifacts/models/        /artifacts/models/
+
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# === QUI PASSO L’IP DAL DOCKERFILE (come nel tuo esempio) ===
+ENV IFACE=eth0
+ENV HOST_IP=10.0.0.21          
+ENV HOST_NETMASK=24
+
+# App defaults (puoi sovrascriverli a runtime)
+ENV IFACE_ICS=eth0 BPF="tcp port 2404" WINDOW_SEC=60 GRACE_SEC=5 \
+    DISC_URL="http://10.0.0.20:8000" PREDICT_PATH="/predict3" \
+    GEN_ENABLED=0 GEN_MODE=feature \
+    GEN_MODEL_PATH="/artifacts/models/generator_best.keras" GEN_LATENT_DIM=64 GEN_BATCH=32 GEN_RATE_PER_MIN=60 GEN_BURST=10 \
+    FEATS_PATH="/artifacts/features.json" SCALER_PATH="/artifacts/scaler.pkl" \
+    LOG_PATH="/data/flows.jsonl" \
+    GNS3_MODE=1
+
+VOLUME ["/data"]
+ENTRYPOINT ["/usr/local/bin/entrypoint-agent.sh"]
