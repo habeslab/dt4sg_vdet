@@ -1,0 +1,79 @@
+name: gan-ics
+
+services:
+  disc-api:
+    build:
+      context: .
+      dockerfile: ./disc-api/Dockerfile_disc
+    container_name: disc-api
+    restart: unless-stopped
+    environment:
+      MODEL_PATH: /artifacts/models/discriminator_best.keras
+      SCALER_PATH: /artifacts/scaler.pkl
+      FEATS_PATH:  /artifacts/features.json
+      AUTO_TUNE: "0"
+      VAL_CSV: /out_pipeline/gan_val_raw.csv
+      TAU_FAKE: "0.9"
+      TAU_MAL:  "0.7"
+      MGMT_DHCP: "0"
+    cap_add: ["NET_ADMIN"]
+    volumes:
+      - /home/mino/Documenti/e.q.u.a.r.l.s/gan-ics/out_pipeline:/out_pipeline:ro
+      - /home/mino/Documenti/e.q.u.a.r.l.s/gan-ics/out_pipeline/artifacts/features.json:/artifacts/features.json:ro
+      - /home/mino/Documenti/e.q.u.a.r.l.s/gan-ics/out_pipeline/artifacts/scaler.pkl:/artifacts/scaler.pkl:ro
+      - /home/mino/Documenti/e.q.u.a.r.l.s/gan-ics/out_pipeline/artifacts/models:/artifacts/models:ro
+    networks:
+      - mgmt
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0) if urllib.request.urlopen('http://localhost:8000/healthz',timeout=2).getcode()==200 else sys.exit(1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  net-agent:
+    build:
+      context: .
+      dockerfile: ./net-agent/Dockerfile_agent
+    container_name: net-agent
+    restart: unless-stopped
+    depends_on:
+      disc-api:
+        condition: service_healthy
+    environment:
+      DISC_URL: "http://disc-api:8000"  # PATCH
+      IFACE_ICS: "eth1"                           # PATCH
+      BPF: "tcp port 2404"                           # PATCH (più permissivo per test)
+      WINDOW_SEC: "5"                             # PATCH 60
+      GRACE_SEC: "2"                              # PATCH 5
+      GEN_ENABLED: "0"
+      GEN_MODE: "feature"
+      GEN_MODEL_PATH: "/artifacts/models/generator_best.keras"
+      GEN_LATENT_DIM: "64"
+      GEN_BATCH: "16"
+      GEN_RATE_PER_MIN: "6"
+      GEN_BURST: "2"
+      FEATS_PATH: "/artifacts/features.json"
+      SCALER_PATH: "/artifacts/scaler.pkl"
+      MGMT_DHCP: "0"
+      GNS3_MODE: "0"  
+      ICS_DHCP: "0"
+      ICS_PROMISC: "1"
+      OUT_JSONL_PATH: "/data/flows.jsonl"         # PATCH
+    cap_add: ["NET_ADMIN", "NET_RAW"]
+    volumes:
+      - /home/mino/Documenti/e.q.u.a.r.l.s/gan-ics/out_pipeline/artifacts:/artifacts:ro
+      - ./data:/data
+      - ./pcaps-benigni:/data/pcaps-benigni       # PATCH (monta pcaps benigni)
+      - ./dataset-maligno:/data/dataset-maligno   # PATCH (monta pcaps maligni)
+    networks:
+      - mgmt
+      - ics
+
+networks:
+  mgmt:
+    driver: bridge
+  ics:
+    driver: bridge
