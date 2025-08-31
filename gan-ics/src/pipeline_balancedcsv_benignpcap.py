@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 """
 Pipeline: Balanced CSV (maligni) + PCAP (benigni) -> train/val pronti (schema semplice)
 - Scansione ricorsiva cartelle fornite

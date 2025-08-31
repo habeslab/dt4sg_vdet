@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from __future__ import annotations
 import os, time, json, pickle, argparse
 from datetime import datetime
@@ -53,7 +50,6 @@ def make_feat_extractor(D: tf.keras.Model) -> tf.keras.Model:
     2) altrimenti usa il penultimo layer
     3) fallback: usa direttamente l'output (non cambia la logica perché FM_W=0 di default)
     """
-    # tentativo per nome dense_<k>
     try:
         last_idx = -1
         for l in D.layers:
@@ -119,7 +115,6 @@ def gen_step(D, G, F, gen_opt, real_x, latent_dim, noise_std, fm_w):
         if noise_std > 0:
             fake_x2 = fake_x2 + tf.random.normal(tf.shape(fake_x2), stddev=noise_std)
         logits_fake2 = D(fake_x2, training=False)
-        # loss che "spinge" contro la classe fake (indice 2)
         logit_fake_col = logits_fake2[:, 2]
         g_loss = tf.reduce_mean(tf.nn.softplus(logit_fake_col))
         if fm_w > 0.0:
@@ -326,7 +321,6 @@ def main():
                 f"{acc_val:.6f},{rfp_val:.6f},{fr_val:.6f},{steps_per_epoch},{secs:.3f}\n"
             )
 
-        # --- vecchia logica: best checkpoint su FR(val) (immutata) ---
         if fr_val > best_val:
             best_val = fr_val
             G.save(gen_path)
@@ -334,7 +328,6 @@ def main():
             if LOG_CKPT:
                 print(f"  [CKPT] Salvati G -> {gen_path.name}  D -> {disc_path.name}  (best val_FR={best_val:.3f})")
 
-        # --- nuova logica: best fisso su rFP(val) (minimizza) ---
         if rfp_val < best_rfp:
             best_rfp = float(rfp_val)
             D.save(best_fixed_disc)
@@ -350,7 +343,7 @@ def main():
         if PLOT_LIVE and PLOT_EVERY >= 1 and (epoch % PLOT_EVERY == 0):
             _save_training_plots(csv_log, plots_dir, tag=ts)
 
-    # salvataggi finali (come prima)
+    # salvataggi finali 
     G.save(ART / "models" / "generator_model.keras")
     D.save(ART / "models" / "discriminator_model.keras")
     print("[OK] Training completato. Log CSV:", csv_log)

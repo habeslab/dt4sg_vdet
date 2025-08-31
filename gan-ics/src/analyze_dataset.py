@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 """
 EDA per dataset GAN-ICS (schema semplice)
 - Legge da OUT_ROOT: gan_train_raw.csv, gan_val_raw.csv, artifacts/features.json
@@ -85,11 +82,8 @@ def ks_approx_pvalue_via_bins(a: np.ndarray, b: np.ndarray, bins: int = 50) -> T
     ca = np.cumsum(ha) / max(1, np.sum(ha))
     cb = np.cumsum(hb) / max(1, np.sum(hb))
     D = float(np.max(np.abs(ca - cb)))
-    # p-value approx (Smirnov), n_eff = n_a n_b / (n_a + n_b)
     na, nb = len(a), len(b)
     n_eff = (na * nb) / (na + nb + 1e-9)
-    # Asymptotic KS: p ~ 2 * sum_{j=1..inf} (-1)^{j-1} exp(-2 j^2 D^2 n_eff)
-    # Troncatura j=1..3
     t = 2.0 * (np.exp(-2 * (D**2) * n_eff) - np.exp(-8 * (D**2) * n_eff) + np.exp(-18 * (D**2) * n_eff))
     p = max(0.0, min(1.0, float(t)))
     return D, p

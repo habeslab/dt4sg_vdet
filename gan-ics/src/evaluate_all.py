@@ -1,26 +1,37 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from __future__ import annotations
 import argparse, json, os, sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-# --- CPU first: se l'utente ha passato --cpu, spegniamo la GPU PRIMA di importare TF ---
+"""
+Script per la valutazione di Discriminatore e Generatore di una GAN su dataset tabellari.
+
+Funzionalità principali:
+- Carica scaler e specifiche delle feature da <data_root>/artifacts/.
+- Valuta il Discriminatore su un CSV reale (gan_val_raw.csv, gan_train_raw.csv o uno fornito).
+- Calcola metriche (accuratezza, matrice di confusione, precision/recall, FPR) e genera grafici.
+- (Opzionale) Valuta il Generatore producendo campioni sintetici e misurando il fooling rate.
+- Salva risultati e grafici in artifacts/plots/ e un report JSON in artifacts/reports/eval_all.json.
+
+Esecuzione tipica:
+    python eval_all.py --data-root /path --disc disc.keras [--gen gen.keras] [--csv file.csv] [--cpu]
+"""
+
+
 CPU_MODE = ("--cpu" in sys.argv)
 if CPU_MODE:
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
-    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")  # silenzioso ma non invasivo
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")  
 
 import tensorflow as tf
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from utils import robust_load_model, logits_to_proba  # softmax robusta
+from utils import robust_load_model, logits_to_proba  
 
-# --- loader tollerante al MinibatchStdDev (come nei tuoi script) ---
+
 def _load_disc_tolerant(path: str) -> tf.keras.Model:
     try:
         return robust_load_model(path, custom_objects=None, compile=False)
@@ -141,7 +152,7 @@ def evaluate_discriminator(model_path: Path, data_root: Path, csv_path: Path|Non
         TN=FP=FN=TP=0
         prec1=rec1=fpr0=0.0
 
-    # --- sweep soglia su p(1|{0,1}) mantenendo la stessa policy di astensione ---
+
     targets = [0.50, 0.60, 0.70, 0.80, 0.90]
     sweep = []
     if np.any(mask_real):

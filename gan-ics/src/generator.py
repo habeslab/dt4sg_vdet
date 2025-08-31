@@ -1,4 +1,3 @@
-# generator.py
 from __future__ import annotations
 import tensorflow as tf
 from tensorflow.keras import layers, regularizers  # type: ignore

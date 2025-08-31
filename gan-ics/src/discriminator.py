@@ -1,4 +1,3 @@
-# discriminator.py
 from __future__ import annotations
 from typing import Optional
 import tensorflow as tf
@@ -19,12 +18,12 @@ class MinibatchStdDev(layers.Layer):
         x = tf.cast(inputs, tf.float32)
         mean = tf.reduce_mean(x, axis=0, keepdims=True)
         var  = tf.reduce_mean(tf.square(x - mean), axis=0, keepdims=True)
-        std  = tf.sqrt(var + self.epsilon)              # [1, F]
-        avg_std = tf.reduce_mean(std, axis=1, keepdims=True)  # [1, 1]
+        std  = tf.sqrt(var + self.epsilon)             
+        avg_std = tf.reduce_mean(std, axis=1, keepdims=True)  
         # broadcast a [B, 1]
         b = tf.shape(x)[0]
         mb_feat = tf.tile(avg_std, [b, 1])
-        return tf.concat([x, mb_feat], axis=-1)         # [B, F+1]
+        return tf.concat([x, mb_feat], axis=-1)      
 
 def build_discriminator(input_dim: int,
                         hidden_dims=(256, 128, 64),
