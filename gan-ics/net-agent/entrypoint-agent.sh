@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Precedenza IP come sopra:
 # 1) HOST_IP + HOST_NETMASK  2) MGMT_IP_CIDR  3) DHCP→fallback
 
 MGMT_IFACE="${MGMT_IFACE:-${IFACE:-eth0}}"

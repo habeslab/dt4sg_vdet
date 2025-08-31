@@ -1,8 +1,7 @@
-# /app/agent/generator_model_mode.py
 from __future__ import annotations
 """
 Generator FEATURE-MODE per net-agent.
-Espone GeneratorWorker(start/stop) compatibile con main.py.
+Espone GeneratorWorker(start/stop).
 """
 
 import os

@@ -21,12 +21,11 @@ COPY out_pipeline/artifacts/models/        /artifacts/models/
 
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# === QUI PASSO L’IP DAL DOCKERFILE (come nel tuo esempio) ===
 ENV IFACE=eth0
 ENV HOST_IP=10.0.0.21          
 ENV HOST_NETMASK=24
 
-# App defaults (puoi sovrascriverli a runtime)
+# App defaults 
 ENV IFACE_ICS=eth0 BPF="tcp port 2404" WINDOW_SEC=60 GRACE_SEC=5 \
     DISC_URL="http://10.0.0.20:8000" PREDICT_PATH="/predict3" \
     GEN_ENABLED=0 GEN_MODE=feature \

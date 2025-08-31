@@ -1,4 +1,3 @@
-# /net-agent/agent/main.py
 from __future__ import annotations
 """
 Entry point del net-agent:

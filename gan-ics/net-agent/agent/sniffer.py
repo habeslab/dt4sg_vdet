@@ -1,4 +1,3 @@
-# /net-agent/agent/sniffer.py
 from __future__ import annotations
 """
 Sniffer: cattura pacchetti ICS (IEC-104 su TCP/2404 per default), aggrega su finestre temporali

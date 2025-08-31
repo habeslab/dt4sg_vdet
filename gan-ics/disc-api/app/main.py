@@ -1,4 +1,3 @@
-# /disc-api/app/main.py
 from __future__ import annotations
 """
 Discriminatore come servizio (disc-api)
@@ -53,7 +52,7 @@ except Exception:
 
 # opzionale per auto-tune (caricato on-demand)
 try:
-    import pandas as pd  # solo se AUTO_TUNE=1 e c'è il CSV
+    import pandas as pd  
 except Exception:
     pd = None
 
@@ -193,7 +192,6 @@ def _auto_tune_thresholds(model: tf.keras.Model, scaler, feats: List[str], val_c
     # quantili prudenziali
     q_fake = float(np.quantile(p2, 0.95))
     q_mal  = float(np.quantile(p_mal_2c, 0.95 if y is None else 0.90))
-    # clamp in [0,1]
     q_fake = float(min(1.0, max(0.5, q_fake)))
     q_mal  = float(min(1.0, max(0.5, q_mal)))
     return q_fake, q_mal
@@ -222,7 +220,7 @@ def healthz():
 @app.post("/predict3")
 def predict3(payload: Dict[str, object]):
     feats: Dict[str, float] = (payload or {}).get("features") or {}  # type: ignore[assignment]
-    meta: Dict[str, object]  = (payload or {}).get("meta") or {}      # opzionale, pass-through
+    meta: Dict[str, object]  = (payload or {}).get("meta") or {}      
 
     feats_order: List[str] = STATE["features_order"]  # type: ignore[assignment]
     missing = [f for f in feats_order if f not in feats]
@@ -267,8 +265,8 @@ def predict3(payload: Dict[str, object]):
         "p_mal_2c": p_mal_2c,
         "thresholds": {"tau_fake": tau_fake, "tau_mal": tau_mal, "source": STATE["thresholds"]["source"]},  # type: ignore[index]
         "origin": origin,
-        "label": label,               # etichetta operativa
-        "model_label": model_label,   # argmax del modello (pura)
+        "label": label,             
+        "model_label": model_label,   
         "model_version": STATE["model_version"],
         "meta": meta,
     })

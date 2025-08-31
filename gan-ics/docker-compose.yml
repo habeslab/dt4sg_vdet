@@ -43,11 +43,11 @@ services:
       disc-api:
         condition: service_healthy
     environment:
-      DISC_URL: "http://disc-api:8000"  # PATCH
-      IFACE_ICS: "eth1"                           # PATCH
-      BPF: "tcp port 2404"                           # PATCH (più permissivo per test)
-      WINDOW_SEC: "5"                             # PATCH 60
-      GRACE_SEC: "2"                              # PATCH 5
+      DISC_URL: "http://disc-api:8000" 
+      IFACE_ICS: "eth1"                           
+      BPF: "tcp port 2404"                           
+      WINDOW_SEC: "5"                             
+      GRACE_SEC: "2"                             
       GEN_ENABLED: "0"
       GEN_MODE: "feature"
       GEN_MODEL_PATH: "/artifacts/models/generator_best.keras"
@@ -61,13 +61,13 @@ services:
       GNS3_MODE: "0"  
       ICS_DHCP: "0"
       ICS_PROMISC: "1"
-      OUT_JSONL_PATH: "/data/flows.jsonl"         # PATCH
+      OUT_JSONL_PATH: "/data/flows.jsonl"         
     cap_add: ["NET_ADMIN", "NET_RAW"]
     volumes:
       - /home/mino/Documenti/e.q.u.a.r.l.s/gan-ics/out_pipeline/artifacts:/artifacts:ro
       - ./data:/data
-      - ./pcaps-benigni:/data/pcaps-benigni       # PATCH (monta pcaps benigni)
-      - ./dataset-maligno:/data/dataset-maligno   # PATCH (monta pcaps maligni)
+      - ./pcaps-benigni:/data/pcaps-benigni       
+      - ./dataset-maligno:/data/dataset-maligno   
     networks:
       - mgmt
       - ics

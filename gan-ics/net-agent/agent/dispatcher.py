@@ -1,4 +1,3 @@
-# /net-agent/agent/dispatcher.py
 from __future__ import annotations
 import json
 import os
@@ -8,6 +7,20 @@ from typing import Any, Dict, Optional
 import threading
 import queue as _queue
 import requests
+
+"""
+Dispatcher per inoltrare feature al servizio disc-api e loggare le risposte in JSONL.
+
+- Coda thread-safe + pool di worker per invii concorrenti a `DEFAULT_DISC_URL` (/predict3).
+- Ritenti HTTP configurabili (TIMEOUT, RETRY, RETRY_SLEEP) con backoff fisso.
+- Decision policy: usa p2 (tau_fake) per OOD/alert e p_mal_2c (tau_mal) per benign/malicious.
+- Ogni record salvato su `OUT_JSONL_PATH` include meta (ts, flow_id), risposta e decisione.
+- Metodi principali:
+  * submit(features, meta): enqueue non bloccante (auto-ts).
+  * start()/stop(): lifecycle dei worker e gestione file di output.
+  * send_and_log(features, meta): invio sincrono + decisione + persistenza.
+- Variabili d’ambiente utili: DISC_URL, OUT_JSONL_PATH, DISC_TIMEOUT_SEC, DISC_RETRY, DISC_RETRY_SLEEP.
+"""
 
 DEFAULT_DISC_URL = os.getenv("DISC_URL", "http://disc-api:8000/predict3")
 OUT_JSONL_PATH = Path(os.getenv("OUT_JSONL_PATH", "/data/flows.jsonl"))
