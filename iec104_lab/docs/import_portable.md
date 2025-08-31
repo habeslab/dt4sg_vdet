@@ -1,41 +1,77 @@
-## 2 — Import into GNS3 via portable project
+# Importing the Lab into GNS3 via **Portable Project**
 
-1. Launch **GNS3** and create a **New Project** (for example *iec104_lab*).  
-2. Navigate to **File ▸ Import portable project…**  
-3. Select the freshly downloaded `iec104_lab\project_portable\Digital_twin_iec104.portable` and click **Open**.  
-4. Choose (or confirm) the destination folder for the project.  
-5. Click the **Start** (►) button in the toolbar to power on all nodes.
+This guide explains how to import the IEC‑104 Digital Twin laboratory as a **portable GNS3 project**, including all base images and topology, for rapid deployment. This method is ideal for demos, training environments, or when distributing the lab to colleagues.
 
-> ✅ Within seconds, the containers will be online and the links will turn green.
+---
 
-## 3 — Working with the containers
+## 1 — Portable project overview
 
-| Task | Command |
-|------|---------|
-| Open a shell inside an RTU | `docker exec -it  "node name" /bin/bash` |
-| Run the attack script      | ` docker exec -it attacker ./attack.sh`  |
-| Open a shell in an RTU     | `docker exec -it  "ids" /bin/bash`       |
-| Stream Suricata logs live  | `tail -f /var/log/suricata/eve.json`     |
+A portable project is a single archive (`.portable`) containing:
 
-## Launching Attack Scenarios
+* Node templates and configuration
+* Topology wiring
+* Optionally: Docker images (embedded)
 
-The **attacker** container provides the control script `/attack.sh`,  
-which guides you through the available IEC-104 penetration tests.
+Example file: `iec104_lab/project_portable/Digital_twin_iec104.portable`
 
-    docker compose exec attacker /attack.sh
-    # or, if the container name differs:
-    docker exec -it attacker_node /attack.sh
+---
 
-### Menu options
+## 2 — Import into GNS3
 
-| Option | Scenario            | Operational details |
-|--------|---------------------|---------------------|
-| **1 – IDS test-suite** | *Synthetic attacks* | Generates three demonstration flows (lateral movement, external intrusion, SYN-flood) to validate the installed IDS/IPS rules. |
-| **2 – Automatic replay** | *Dataset playback* | Sequentially replays — preserving the original timing — **all** `*.pcap` files located in **/data**. The engine is dataset-agnostic: any **IEC-104 over TCP** capture placed in `/data` is detected and injected, with no constraints on file names or folder structure. |
+1. Launch **GNS3**.
+2. Go to **File ▸ Import portable project…**.
+3. Select the portable archive (`.portable`) provided.
+4. Choose a destination folder for the project.
+5. Finish the wizard → the full topology and nodes appear in your workspace.
 
-### Runtime parameters
+> ✅ Within seconds, the entire lab (RTUs, Master, IDS, Attacker, plus GAN services **net-agent** and **disc-api**) is imported.
 
-| Variable        | Default | Purpose |
-|-----------------|---------|---------|
-| `DELAY_FACTOR`  | `1.0`   | Timing scale for the replay (`0.5` = twice as fast, `2` = half-speed). |
-| `IFACE`         | `eth0`  | Network interface used by Scapy to transmit the frames. |
+---
+
+## 3 — Post‑import checks
+
+* Verify node names and links match the intended topology (`iec104_lab/docs/topology.png`).
+* Ensure **IDS** has 2 adapters: `eth0 → rtu_switch`, `eth1 → ot_switch`.
+* If **net-agent** and **disc-api** are included, they behave like any other node. Use the same procedure as for RTUs or Master.
+
+---
+
+## 4 — Operating nodes
+
+Open shells and execute commands directly:
+
+```bash
+# Open a shell in any node
+docker exec -it <node> /bin/bash
+
+# Launch the attack suite
+docker exec -it attacker ./attack.sh
+
+# Monitor Suricata logs
+docker exec -it ids bash -lc 'tail -f /var/log/suricata/eve.json'
+```
+
+**Monitor NET‑AGENT classifications**:
+
+```bash
+docker exec -it net-agent bash -lc 'ls -lh /data; tail -F /data/flows.jsonl 2>/dev/null | grep -a --line-buffered "flow_id"'
+```
+
+**Enable the NET‑AGENT generator**:
+
+```yaml
+environment:
+  - GEN_ENABLED_=1
+```
+
+Set this variable in the container template (or compose definition) and restart the node.
+
+---
+
+## 5 — Troubleshooting
+
+* **Missing images**: If images were not embedded in the portable file, GNS3 prompts you to map them. Build them beforehand via Compose.
+* **Adapters mismatch**: Edit the node template to adjust interface count.
+* **Logs not visible**: Use `docker logs -f <node>` for debugging. Check NET‑AGENT `/data/flows.jsonl` for real‑time flow analysis.
+
+---
