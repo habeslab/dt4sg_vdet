@@ -31,7 +31,9 @@
 /gan-ics/artifacts/calibration_2c.json
 !/gan-ics/artifacts/calibration_2c.example.json
 
-
+# --- sblocca utils ---
+!/utils/
+!/utils/sniff_all.sh
 
 # rumore Python/venv in qualunque cartella già permessa
 __pycache__/
