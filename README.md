@@ -102,8 +102,10 @@ $$
 
 * Discriminator:
 
+$$
+L_{DISC} = - E_{x \sim p_{data}} [\log p_{label}(x)] - E_{z \sim p_z} [\log (1 - p_{synthetic}(G(z)))]
+$$
 
-$$ L_{DISC} = -\mathbb{E}_{x \sim p_{data}}[\log p_{label}(x)] $$ - $$ \mathbb{E}_{z \sim p_z}[\log (1 - p_{synthetic}(G(z)))] $$
 
 
 **Operational Policy:**
