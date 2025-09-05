@@ -1,6 +1,6 @@
-# IEC-104 Digital Twin Laboratory with Integrated GAN (E.Q.U.A.R.L.S.)
+# Penetration Testing Auto-Evolutivo con Architettura GAN applicato ai Digital Twin per Industrial Control Systems. (S.T.E.L.L.A.)
 
-> **E.Q.U.A.R.L.S.** — *E quindi uscimmo a riveder le stelle*
+> **S.T.E.L.L.A.** — *(Self-Testing Evolutionary Learning for Liberating Assurance)*
 > A comprehensive digital twin of an OT/ICS substation enhanced with a **Generative Adversarial Network (GAN)** for anomaly detection, renewable-grid interaction, and cyber-security research.
 
 ---

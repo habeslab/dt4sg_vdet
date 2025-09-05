@@ -18,10 +18,10 @@ services:
       MGMT_DHCP: "0"
     cap_add: ["NET_ADMIN"]
     volumes:
-      - /home/mino/Documenti/e.q.u.a.r.l.s/gan-ics/out_pipeline:/out_pipeline:ro
-      - /home/mino/Documenti/e.q.u.a.r.l.s/gan-ics/out_pipeline/artifacts/features.json:/artifacts/features.json:ro
-      - /home/mino/Documenti/e.q.u.a.r.l.s/gan-ics/out_pipeline/artifacts/scaler.pkl:/artifacts/scaler.pkl:ro
-      - /home/mino/Documenti/e.q.u.a.r.l.s/gan-ics/out_pipeline/artifacts/models:/artifacts/models:ro
+      - /home/mino/Documenti/S.T.E.L.L.A./gan-ics/out_pipeline:/out_pipeline:ro
+      - /home/mino/Documenti/S.T.E.L.L.A./gan-ics/out_pipeline/artifacts/features.json:/artifacts/features.json:ro
+      - /home/mino/Documenti/S.T.E.L.L.A./gan-ics/out_pipeline/artifacts/scaler.pkl:/artifacts/scaler.pkl:ro
+      - /home/mino/Documenti/S.T.E.L.L.A./gan-ics/out_pipeline/artifacts/models:/artifacts/models:ro
     networks:
       - mgmt
     ports:
@@ -64,7 +64,7 @@ services:
       OUT_JSONL_PATH: "/data/flows.jsonl"         
     cap_add: ["NET_ADMIN", "NET_RAW"]
     volumes:
-      - /home/mino/Documenti/e.q.u.a.r.l.s/gan-ics/out_pipeline/artifacts:/artifacts:ro
+      - /home/mino/Documenti/S.T.E.L.L.A./gan-ics/out_pipeline/artifacts:/artifacts:ro
       - ./data:/data
       - ./pcaps-benigni:/data/pcaps-benigni       
       - ./dataset-maligno:/data/dataset-maligno   
