@@ -139,9 +139,11 @@ class _FeatureGenerator:
                         "flow_id": flow_id,
                         "synthetic": True,
                         "mode": "feature",
-                        "window_ts": ts
+                        "window_ts": ts,
+                        "ts": ts, 
                     }
-                })
+                    })
+
             time.sleep(interval)
 
     def _dummy_batch(self, batch: int) -> np.ndarray:

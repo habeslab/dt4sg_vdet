@@ -139,6 +139,7 @@ class Sniffer:
                             "window_ts": self._t0 + w * WINDOW_SEC,
                             "synthetic": False,
                             "mode": "sniff",
+                            "timestamp": time.time(),
                         }
                     })
             except Exception:
@@ -170,5 +171,6 @@ class Sniffer:
                     "window_ts": self._t0 + w * WINDOW_SEC,
                     "synthetic": False,
                     "mode": "sniff",
+                    "timestamp": time.time(),
                 }
             })

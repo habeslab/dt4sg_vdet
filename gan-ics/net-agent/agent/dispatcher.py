@@ -7,7 +7,13 @@ from typing import Any, Dict, Optional
 import threading
 import queue as _queue
 import requests
-
+from datetime import datetime, timezone, timedelta
+try:
+    from zoneinfo import ZoneInfo  # Python 3.9+
+    TZ_LOCAL = ZoneInfo("Europe/Rome")
+except Exception:
+    # Fallback (senza cambio automatico ora legale): forza +02:00
+    TZ_LOCAL = timezone(timedelta(hours=2))
 """
 Dispatcher per inoltrare feature al servizio disc-api e loggare le risposte in JSONL.
 
@@ -135,27 +141,84 @@ class Dispatcher:
 
     # log ---------------------------------------------------------------
     def send_and_log(self, features: Dict[str, Any], meta: Dict[str, Any]) -> None:
+        # --- Timestamps robusti lato client ---
+        t_client = float(meta.get("ts") or meta.get("window_ts") or time.time())
+
+        # --- Chiamata al disc-api + rtt http ---
+        t0 = time.time()
         resp = self._post_predict(features, meta)
+        t1 = time.time()
+        rtt_ms = int(max(0, round((t1 - t0) * 1000)))
+
+        # --- Timestamp lato server (dal disc-api) ---
+        t_server = float(resp.get("ts") or t1)
+
+        # --- Decisione e rischio (come prima) ---
         decision, explanation, risk = self._make_decision(resp)
-        record = {
-            "ts": meta.get("ts"),
-            "flow_id": meta.get("flow_id"),
-            "features": features,
-            "synthetic": bool(meta.get("synthetic", False)),
-            "mode": meta.get("mode", "sniff"),
-            "latency_ms": meta.get("latency_ms"),
-            "response": resp,
-            "decision": decision,
-            "explanation": explanation,
-            "risk": risk,
+
+        # --- Metriche di latenza (spiegate) ---
+        e2e_sec = max(0.0, round(t_server - t_client, 3))  # end-to-end: cattura -> decisione
+        latency_expl = f"end_to_end = server_ts - ts = {t_server:.3f} - {t_client:.3f} ≈ {e2e_sec:.3f}s"
+
+        # --- Selezione campi chiave dalla risposta per non 'rumoreggiare' il JSON ---
+        decision_block = {
+            "label": resp.get("label"),
+            "origin": resp.get("origin"),
+            "model": resp.get("model_version"),
+            "p2": resp.get("p2"),
+            "p_mal_2c": resp.get("p_mal_2c"),
+            "thresholds": (resp.get("thresholds") or {}),
         }
-        if decision == "alert":
-            print(f"[ALERT][{record.get('flow_id')}] {explanation}", flush=True)
+
+        # --- Record compatto ma esplicativo ---
+        record = {
+            "flow_id": meta.get("flow_id"),
+            "mode": meta.get("mode", "sniff"),
+            "synthetic": bool(meta.get("synthetic", False)),
+
+            "timestamps": {
+                "client": {
+                    "epoch": t_client,
+                    "utc": iso_utc(t_client),
+                    "local": iso_local(t_client),
+                },
+                "server": {
+                    "epoch": t_server,
+                    "utc": iso_utc(t_server),
+                    "local": iso_local(t_server),
+                },
+            },
+
+            "latency": {
+                "http_rtt_ms": rtt_ms,
+                "end_to_end_s": e2e_sec,
+                "explanation": latency_expl,
+            },
+
+            "features": features,
+            "decision": decision_block,
+            "risk": risk,
+            "explanation": explanation,
+        }
+
+        # --- Log console 'accattivante' e leggibile a colpo d'occhio ---
+        pretty_line = (
+        f"[{record['timestamps']['server']['local']}] "
+        f"{record['mode']} flow={record['flow_id']} "
+        f"→ {decision_block['label']}/{decision_block['origin']} "
+        f"(e2e≈{e2e_sec:.2f}s, http={rtt_ms}ms, p2={_fmt(decision_block['p2'])}, "
+        f"mal2c={_fmt(decision_block['p_mal_2c'])})"
+        )
+        print(pretty_line, flush=True)
+
+        # --- Scrittura JSONL (1 riga compatta e pulita) ---
         try:
             line = json.dumps(record, ensure_ascii=False)
             self._fh.write(line + "\n")
         except Exception as e:
             print(f"[dispatcher] errore scrittura JSONL: {e}", flush=True)
+
+
 
     # worker loop -------------------------------------------------------
     def _worker_loop(self) -> None:
@@ -172,3 +235,16 @@ class Dispatcher:
                 self.send_and_log(features, meta)
             except Exception as e:
                 print(f"[dispatcher] errore worker: {e}", flush=True)
+
+def iso_utc(ts: float) -> str:
+    """2025-09-07T13:48:17Z"""
+    return datetime.fromtimestamp(ts, tz=timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+def iso_local(ts: float) -> str:
+    """2025-09-07T15:48:17+02:00 (Europe/Rome, con DST se ZoneInfo disponibile)"""
+    return datetime.fromtimestamp(ts, tz=TZ_LOCAL).isoformat(timespec="seconds")
+def _fmt(x):
+    try:
+        return f"{float(x):.3f}"
+    except Exception:
+        return "n/a"
