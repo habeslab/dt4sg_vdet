@@ -1,6 +1,11 @@
 # --- ignora tutto di default ---
 *
 
+# --- sblocca project_portable ---
+!/iec104_lab/project_portable/
+!/iec104_lab/project_portable/**
+
+
 # file sempre tracciati a livello root
 !.gitignore
 !/README.md
