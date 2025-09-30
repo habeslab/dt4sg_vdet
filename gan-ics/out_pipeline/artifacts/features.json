@@ -1,0 +1,9 @@
+{
+  "features": [
+    "sport",
+    "dport",
+    "proto",
+    "pkt_count",
+    "bytes_total"
+  ]
+}
