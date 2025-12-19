@@ -162,7 +162,18 @@ services:
     environment:
       - ATTACKER_IP=10.0.0.99/24        
     networks:
-      - rtu_net                          
+      - rtu_net           
+
+  rtuattacker:
+    container_name: rtuattacker_node
+    build:
+      context: .                      
+      dockerfile: docker/Dockerfile.rtuattacker
+    privileged: true                     
+    environment:
+      - ATTACKER_IP=10.0.0.90/24        
+    networks:
+      - rtu_net                       
 
 
 # --------------------------------------------------------------------

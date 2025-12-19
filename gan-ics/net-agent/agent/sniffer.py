@@ -16,10 +16,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger("Sniffer")
 
-IFACE_ICS  = os.getenv("IFACE_ICS", "eth1")
+IFACE_ICS  = os.getenv("ICS_IFACE", "eth1")
 BPF        = os.getenv("BPF", "tcp port 2404")
-WINDOW_SEC = int(os.getenv("WINDOW_SEC", "60"))
+WINDOW_SEC = int(os.getenv("WINDOW_SEC", "20"))
 GRACE_SEC  = int(os.getenv("GRACE_SEC",  "5"))
+EXCLUDE_IP = os.getenv("EXCLUDE_IP", "10.0.0.20")
 
 # Flow canonico (bidirezionale): endpoint A < endpoint B
 Endpoint = Tuple[str, int]  # (ip, port)
@@ -177,12 +178,13 @@ class Sniffer:
                 tcp = pkt[TCP]
                 src = ip.src
                 dst = ip.dst
+                if src == EXCLUDE_IP or dst == EXCLUDE_IP:
+                    return
+
                 sport = int(tcp.sport)
                 dport = int(tcp.dport)
                 proto = 6  # TCP
-
-
-
+                
                 if sport <= 0 or dport <= 0:
                     return
 
@@ -208,6 +210,7 @@ class Sniffer:
                 payload = bytes(tcp.payload) if tcp.payload is not None else b""
                 iec_type = _iec104_msg_type(payload)
                 apdu_len = _iec104_apdu_len(payload)
+                
                 if iec_type:
                     logger.debug(
                         "IEC-104 detected: type=%s direction=%s",

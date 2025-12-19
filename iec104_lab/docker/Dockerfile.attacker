@@ -25,5 +25,7 @@ COPY docker/pcap_replayer.py /usr/local/bin/pcap_replayer.py
 COPY dataset_attack /data
 RUN chmod +x /entrypoint_attacker.sh /attack.sh /usr/local/bin/pcap_replayer.py
 
+ENV ATTACK_DIR=/data/attacker2
+
 ENTRYPOINT ["/entrypoint_attacker.sh"]
 CMD ["/bin/bash"]

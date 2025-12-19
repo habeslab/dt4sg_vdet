@@ -7,6 +7,8 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 import pandas as pd
+import csv
+from datetime import datetime
 
 import numpy as np
 from fastapi import FastAPI, HTTPException
@@ -46,6 +48,8 @@ FEATS_PATH  = os.getenv("FEATS_PATH", f"{ARTIFACTS_DIR}/features_three.json")
 # mapping class labels (se nel training hai usato stringhe diverse)
 # es: "benign,malicious,synthetic"
 CLASS_ORDER_ENV = os.getenv("CLASS_ORDER", "0,1,2")
+
+PRED_CSV_PATH = os.getenv("PRED_CSV_PATH", f"{ARTIFACTS_DIR}/predictions_log.csv")
 
 # =========================
 # Util: features.json loader
@@ -131,6 +135,46 @@ def _startup_load() -> None:
         "class_order": desired,
     })
 
+def _append_prediction_csv(
+    csv_path: str,
+    feats_order: List[str],
+    feats: Dict[str, object],
+    meta: Dict[str, object],
+    p0: float,
+    p1: float,
+    p2: float,
+    model_version: str,
+) -> None:
+
+    # Costruisci riga
+    row: Dict[str, object] = {
+        "ts": time.time(),
+        "flow_id": str(meta.get("flow_id")),
+        "model_version": model_version,
+        "p0": p0,
+        "p1": p1,
+        "p2": p2,
+    }
+
+    # Aggiungi feature (come float coerenti con inferenza)
+    for f in feats_order:
+        row[f] = _as_float(feats.get(f))
+
+    path = Path(csv_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Header (campi fissi + feature)
+    fieldnames = ["ts", "flow_id", "model_version", "p0", "p1", "p2"] + list(feats_order)
+
+    file_exists = path.exists()
+    # Append: aggiunge una riga ogni volta (non sovrascrive l’intero file)
+    with path.open("a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(row)
+        f.flush() 
+
 # =========================
 # FastAPI
 # =========================
@@ -181,7 +225,6 @@ def predict3(payload: Dict[str, object]):
     x_df = x_df.replace([np.inf, -np.inf], np.nan).fillna(0.0)
 
     probs_raw = STATE["model"].predict_proba(x_df)[0]
-    
 
 
     probs_raw = np.asarray(probs_raw, dtype=np.float64).ravel()
@@ -194,17 +237,30 @@ def predict3(payload: Dict[str, object]):
 
     if p0 < p1 or p0 < p2:
         # If p1 greater than p0 then we need to check the exact class for the 
-        print({
+        logger.debug({
             "ts": time.time(),
-            "features_order": feats_order,
-            "p0": p0, "p1": p1, "p2": p2,
-            "model_version": STATE["model_version"],
+            "p0": round(p0, 2), "p1": round(p1, 2), "p2": round(p2, 2),
             "meta": meta,
         })
+    
+    try:
+        _append_prediction_csv(
+            csv_path=PRED_CSV_PATH,
+            feats_order=feats_order,
+            feats=feats,
+            meta=meta,
+            p0=p0,
+            p1=p1,
+            p2=p2,
+            model_version=str(STATE["model_version"]),
+        )
+    except Exception as e:
+        logger.exception("Failed to append prediction to CSV: %s", e)
+
     return JSONResponse({
         "ts": time.time(),
         "features_order": feats_order,
-        "p0": p0, "p1": p1, "p2": p2
+        "p0": p0, "p1": p1, "p2": p2,
         "model_version": STATE["model_version"],
         "meta": meta,
     })

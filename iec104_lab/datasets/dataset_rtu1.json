@@ -1,14 +1,14 @@
 [
-  { "ioa": 11,  "type": "SP", "init": 1, "toggle_sec": 10 },
-  { "ioa": 12,  "type": "SP", "init": 0, "toggle_sec": 10 },
-  { "ioa": 13,  "type": "SP", "init": 1, "toggle_sec": 10 },
-  { "ioa": 14,  "type": "SP", "init": 0, "toggle_sec": 10 },
-  { "ioa": 15,  "type": "SP", "init": 1, "toggle_sec": 10 },
+  { "ioa": 11,  "type": "SP", "init": 1, "toggle_sec": 20 },
+  { "ioa": 12,  "type": "SP", "init": 0, "toggle_sec": 20 },
+  { "ioa": 13,  "type": "SP", "init": 1, "toggle_sec": 20 },
+  { "ioa": 14,  "type": "SP", "init": 0, "toggle_sec": 20 },
+  { "ioa": 15,  "type": "SP", "init": 1, "toggle_sec": 20 },
 
-  { "ioa": 101, "type": "SP", "init": 0, "toggle_sec": 10 },
-  { "ioa": 102, "type": "SP", "init": 1, "toggle_sec": 10 },
-  { "ioa": 103, "type": "SP", "init": 0, "toggle_sec": 10 },
+  { "ioa": 101, "type": "SP", "init": 0, "toggle_sec": 20 },
+  { "ioa": 102, "type": "SP", "init": 1, "toggle_sec": 20 },
+  { "ioa": 103, "type": "SP", "init": 0, "toggle_sec": 20 },
 
-  { "ioa": 201, "type": "SP", "init": 1, "toggle_sec": 10 },
-  { "ioa": 202, "type": "SP", "init": 0, "toggle_sec": 10 }
+  { "ioa": 201, "type": "SP", "init": 1, "toggle_sec": 20 },
+  { "ioa": 202, "type": "SP", "init": 0, "toggle_sec": 20 }
 ]

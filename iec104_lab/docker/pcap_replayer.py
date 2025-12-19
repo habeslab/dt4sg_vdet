@@ -23,6 +23,7 @@ from scapy.all import PcapReader, sendp  # type: ignore
 # ---------------------------------------------------------------------------
 DATA_DIR = Path("/data")                             # volume montato
 DELAY     = float(os.getenv("DELAY_FACTOR", "1.0"))  # scala dei ritardi
+ATTACK_DIR     = Path(os.getenv("ATTACK_DIR", "/data"))
 IFACE     = os.getenv("IFACE", "eth0")               # output interface
 
 # ---------------------------------------------------------------------------
@@ -46,7 +47,7 @@ def replay_file(pcap_path: Path) -> None:
 
 
 def main() -> None:
-    pcap_files = sorted(DATA_DIR.rglob("*.pcap"))
+    pcap_files = sorted(ATTACK_DIR.rglob("*.pcap"))
 
     if not pcap_files:
         print("[!] Nessun file .pcap trovato in /data – uscita.")
