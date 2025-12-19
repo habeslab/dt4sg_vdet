@@ -19,7 +19,7 @@ COPY out_pipeline/artifacts/features.json  /artifacts/features.json
 COPY out_pipeline/artifacts/scaler.pkl     /artifacts/scaler.pkl
 COPY out_pipeline/artifacts/models/        /artifacts/models/
 
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install -r /app/requirements.txt
 
 ENV IFACE=eth0
 ENV HOST_IP=10.0.0.21          
@@ -29,7 +29,7 @@ ENV HOST_NETMASK=24
 ENV IFACE_ICS=eth0 BPF="tcp port 2404" WINDOW_SEC=60 GRACE_SEC=5 \
     DISC_URL="http://10.0.0.20:8000" PREDICT_PATH="/predict3" \
     GEN_ENABLED=0 GEN_MODE=feature \
-    GEN_MODEL_PATH="/artifacts/models/generator_best.keras" GEN_LATENT_DIM=64 GEN_BATCH=32 GEN_RATE_PER_MIN=60 GEN_BURST=10 \
+    GEN_MODEL_PATH="/artifacts/models/generator.keras" GEN_LATENT_DIM=64 GEN_BATCH=32 GEN_RATE_PER_MIN=60 GEN_BURST=10 \
     FEATS_PATH="/artifacts/features.json" SCALER_PATH="/artifacts/scaler.pkl" \
     LOG_PATH="/data/flows.jsonl" \
     GNS3_MODE=1

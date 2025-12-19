@@ -8,5 +8,10 @@
   "total flow packets",
   "bw total IEC104_U_Message packets",
   "fw_subflow_bytes",
-  "fw_subflow_packets"
+  "fw_subflow_packets",
+  "flow packet APDU length var",
+  "fw IAT std",
+  "fw total IEC104_U_Message packets",
+  "total fw packets",
+  "fw packets APDU total length"
 ]

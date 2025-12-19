@@ -99,5 +99,5 @@ echo "[net-agent] Stato interfacce:"
 ip -br addr || true
 ip route || true
 
-echo "[net-agent] Avvio servizi…"
+echo "[net-agent] Avvio servizi..."
 exec python -m agent.main

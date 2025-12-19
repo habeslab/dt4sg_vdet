@@ -8,20 +8,21 @@ services:
     container_name: disc-api
     restart: unless-stopped
     environment:
-      MODEL_PATH: /artifacts/models/discriminator_best.keras
-      SCALER_PATH: /artifacts/scaler.pkl
-      FEATS_PATH:  /artifacts/features.json
+      MODEL_PATH: "/artifacts/rf_model_three.pkl"
+      FEATS_PATH:  "/artifacts/features_three.json"
       AUTO_TUNE: "0"
-      VAL_CSV: /out_pipeline/gan_val_raw.csv
+      VAL_CSV: "/out_pipeline/gan_val_raw.csv"
       TAU_FAKE: "0.9"
       TAU_MAL:  "0.7"
       MGMT_DHCP: "0"
+      MODEL_VERSION: "1.0.0"
     cap_add: ["NET_ADMIN"]
     volumes:
       - ./out_pipeline:/out_pipeline:ro
       - ./out_pipeline/artifacts/features.json:/artifacts/features.json:ro
-      - ./out_pipeline/artifacts/scaler.pkl:/artifacts/scaler.pkl:ro
-      - ./out_pipeline/artifacts/models:/artifacts/models:ro
+      - ./out_pipeline/artifacts/rf_model.pkl:/artifacts/rf_model.pkl:ro
+      - ./out_pipeline/artifacts/features_three.json:/artifacts/features.json:ro
+      - ./out_pipeline/artifacts/rf_model_three.pkl:/artifacts/rf_model.pkl:ro
     networks:
       - mgmt
     ports:
@@ -50,7 +51,7 @@ services:
       GRACE_SEC: "2"                             
       GEN_ENABLED: "0"
       GEN_MODE: "feature"
-      GEN_MODEL_PATH: "/artifacts/models/generator_best.keras"
+      GEN_MODEL_PATH: "/artifacts/models/generator.keras"
       GEN_LATENT_DIM: "64"
       GEN_BATCH: "16"
       GEN_RATE_PER_MIN: "6"

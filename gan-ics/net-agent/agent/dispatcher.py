@@ -166,6 +166,8 @@ class Dispatcher:
             "origin": resp.get("origin"),
             "model": resp.get("model_version"),
             "p2": resp.get("p2"),
+            "p0": resp.get("p0"),
+            "p1": resp.get("p1"),
             "p_mal_2c": resp.get("p_mal_2c"),
             "thresholds": (resp.get("thresholds") or {}),
         }
@@ -206,7 +208,7 @@ class Dispatcher:
         f"[{record['timestamps']['server']['local']}] "
         f"{record['mode']} flow={record['flow_id']} "
         f"→ {decision_block['label']}/{decision_block['origin']} "
-        f"(e2e≈{e2e_sec:.2f}s, http={rtt_ms}ms, p2={_fmt(decision_block['p2'])}, "
+        f"(e2e≈{e2e_sec:.2f}s, http={rtt_ms}ms, p2={_fmt(decision_block['p2'])}, p0={_fmt(decision_block['p0'])}, p1={_fmt(decision_block['p1'])}, "
         f"mal2c={_fmt(decision_block['p_mal_2c'])})"
         )
         print(pretty_line, flush=True)

@@ -18,16 +18,18 @@ RUN chmod +x /usr/local/bin/entrypoint_disc.sh
 RUN mkdir -p /artifacts /out_pipeline
 COPY out_pipeline/artifacts/features.json  /artifacts/features.json
 COPY out_pipeline/artifacts/scaler.pkl     /artifacts/scaler.pkl
-COPY out_pipeline/artifacts/models/        /artifacts/models/
+COPY out_pipeline/artifacts/rf_model.pkl        /artifacts/rf_model.pkl
+COPY out_pipeline/artifacts/rf_model_three.pkl        /artifacts/rf_model_three.pkl
+COPY out_pipeline/artifacts/features_three.json  /artifacts/features_three.json
 
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install -r /app/requirements.txt
 
 # === CONFIG MODELLO (come prima)
-ENV MODEL_PATH="/artifacts/models/discriminator_best.keras" \
-    SCALER_PATH="/artifacts/scaler.pkl" \
-    FEATS_PATH="/artifacts/features.json" \
-    VAL_CSV="/out_pipeline/gan_val_raw.csv" \
-    AUTO_TUNE=0 TAU_FAKE=0.90 TAU_MAL=0.70 MODEL_VERSION="1.0.0"
+#ENV MODEL_PATH="/artifacts/models/discriminator.keras" \
+#    SCALER_PATH="/artifacts/scaler.pkl" \
+#    FEATS_PATH="/artifacts/features.json" \
+#    VAL_CSV="/out_pipeline/gan_val_raw.csv" \
+#    AUTO_TUNE=0 TAU_FAKE=0.90 TAU_MAL=0.70 MODEL_VERSION="1.0.0"
 
 # === QUI PASSO L’IP DAL DOCKERFILE (come nel tuo esempio) ===
 ENV IFACE=eth0

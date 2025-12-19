@@ -9,7 +9,7 @@ set -euo pipefail
 # ── trova i container da monitorare ───────────────────────────────────────
 readarray -t containers < <(
   docker ps --format '{{.Names}} {{.Image}}' |
-  awk '$2 ~ /^iec104_lab_(master|rtu_)/ {print $1}'
+  awk '$2 ~ /^iec104_lab-(master|rtu_)/ {print $1}'
 )
 
 if [[ ${#containers[@]} -eq 0 ]]; then
