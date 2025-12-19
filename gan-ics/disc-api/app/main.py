@@ -204,7 +204,7 @@ def predict3(payload: Dict[str, object]):
     return JSONResponse({
         "ts": time.time(),
         "features_order": feats_order,
-        "p0": p0, "p1": p1, "p2": p2
+        "p0": p0, "p1": p1, "p2": p2,
         "model_version": STATE["model_version"],
         "meta": meta,
     })

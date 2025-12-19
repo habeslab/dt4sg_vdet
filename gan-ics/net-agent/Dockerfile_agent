@@ -21,7 +21,7 @@ COPY out_pipeline/artifacts/models/        /artifacts/models/
 
 RUN pip install -r /app/requirements.txt
 
-ENV IFACE=eth0
+ENV IFACE=eth1
 ENV HOST_IP=10.0.0.21          
 ENV HOST_NETMASK=24
 

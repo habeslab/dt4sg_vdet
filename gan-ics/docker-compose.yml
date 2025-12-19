@@ -22,7 +22,7 @@ services:
       - ./out_pipeline/artifacts/features.json:/artifacts/features.json:ro
       - ./out_pipeline/artifacts/rf_model.pkl:/artifacts/rf_model.pkl:ro
       - ./out_pipeline/artifacts/features_three.json:/artifacts/features.json:ro
-      - ./out_pipeline/artifacts/rf_model_three.pkl:/artifacts/rf_model.pkl:ro
+      - ./out_pipeline/artifacts/rf_model_three.pkl:/artifacts/rf_model_three.pkl:ro
     networks:
       - mgmt
     ports:
@@ -56,8 +56,7 @@ services:
       GEN_BATCH: "16"
       GEN_RATE_PER_MIN: "6"
       GEN_BURST: "2"
-      FEATS_PATH: "/artifacts/features.json"
-      SCALER_PATH: "/artifacts/scaler.pkl"
+      FEATS_PATH: "/artifacts/features_three.json"
       MGMT_DHCP: "0"
       GNS3_MODE: "0"  
       ICS_DHCP: "0"
@@ -66,9 +65,6 @@ services:
     cap_add: ["NET_ADMIN", "NET_RAW"]
     volumes:
       - ./out_pipeline/artifacts:/artifacts:ro
-      - ./data:/data
-      - ./pcaps-benigni:/data/pcaps-benigni       
-      - ./dataset-maligno:/data/dataset-maligno   
     networks:
       - mgmt
       - ics
