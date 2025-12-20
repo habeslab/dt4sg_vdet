@@ -296,7 +296,7 @@ class Sniffer:
         try:
             sniff(
                 iface=IFACE_ICS,
-                #filter=BPF,
+                filter=BPF,
                 store=False,
                 prn=onpkt,
                 stop_filter=lambda _: self._stop.is_set(),

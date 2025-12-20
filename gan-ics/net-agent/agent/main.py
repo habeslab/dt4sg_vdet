@@ -32,8 +32,8 @@ def main() -> None:
         sniffer.start()
 
     # Generatore (feature-mode)
-    gen = GeneratorWorker(q)
-    gen.start()
+    #gen = GeneratorWorker(q)
+    #gen.start()
 
     # Gestione segnali
     stop = False
