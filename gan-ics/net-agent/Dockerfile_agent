@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY net-agent/agent /app/agent
+COPY net-agent/templates /app/templates
 COPY net-agent/requirements.txt /app/requirements.txt
 COPY net-agent/entrypoint-agent.sh /usr/local/bin/entrypoint-agent.sh
 RUN chmod +x /usr/local/bin/entrypoint-agent.sh
@@ -24,6 +25,7 @@ RUN pip install -r /app/requirements.txt
 ENV IFACE=eth1
 ENV HOST_IP=10.0.0.21          
 ENV HOST_NETMASK=24
+ENV MGMT_IP_CIDR=192.168.122.50/24
 
 # App defaults 
 ENV BPF="tcp port 2404" GRACE_SEC=5 \

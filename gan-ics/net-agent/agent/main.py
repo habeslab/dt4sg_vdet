@@ -11,10 +11,15 @@ import os
 import signal
 import queue
 import time
+import threading
+import uvicorn
 
 from agent.sniffer import Sniffer
-from agent.generator_model_mode import GeneratorWorker
 from agent.dispatcher import Dispatcher
+
+def _run_web():
+    port = int(os.getenv("DASH_PORT", "8080"))
+    uvicorn.run("agent.webapp:app", host="0.0.0.0", port=port, log_level="info")
 
 def main() -> None:
     q: "queue.Queue[dict]" = queue.Queue(maxsize=5000)
@@ -23,6 +28,9 @@ def main() -> None:
     workers = int(os.getenv("DISPATCH_WORKERS", "2"))
     disp = Dispatcher(in_queue=q, workers=workers)
     disp.start()
+    
+    t_web = threading.Thread(target=_run_web, name="web", daemon=True)
+    t_web.start()
 
     # Sniffer (opzionale)
     sniff_enabled = os.getenv("SNIFF_ENABLED", "1") not in ("0", "false", "False", "")
@@ -30,11 +38,7 @@ def main() -> None:
     if sniff_enabled:
         sniffer = Sniffer(q)
         sniffer.start()
-
-    # Generatore (feature-mode)
-    #gen = GeneratorWorker(q)
-    #gen.start()
-
+    
     # Gestione segnali
     stop = False
     def _sig(_signum, _frame):
@@ -49,7 +53,6 @@ def main() -> None:
     finally:
         if sniffer:
             sniffer.stop()
-        gen.stop()
         disp.stop()
 
 if __name__ == "__main__":

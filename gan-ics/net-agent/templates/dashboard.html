@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IDS Dashboard</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      /* Light theme */
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --border:#d9deea;
+      --text:#111827;
+      --muted:#5b647a;
+
+      --ok:#16a34a;
+      --warn:#f59e0b;
+      --err:#dc2626;
+
+      --barbg:#e8ecf6;
+      --pillbg:#f2f4fa;
+
+      --shadow: 0 10px 30px rgba(17, 24, 39, .08);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    body{
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .page-wrap{
+      min-height: calc(100vh - 2rem); /* body py-4 = 2rem sopra/sotto */
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow: var(--shadow);
+    }
+
+    .muted{ color:var(--muted); }
+    .mono{ font-family:var(--mono); }
+
+    .pill{
+      border:1px solid var(--border);
+      padding:.35rem .7rem;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      gap:.5rem;
+      background:var(--pillbg);
+    }
+
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      display:inline-block;
+    }
+
+    .bar{
+      height:10px;
+      border-radius:999px;
+      background:var(--barbg);
+      overflow:hidden;
+      border:1px solid var(--border);
+    }
+    .bar>div{ height:100%; }
+
+    .kpi{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+    .kpi .k{
+      background:#fbfcff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px 12px;
+    }
+    .k .label{
+      font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .k .value{
+      margin-top:4px;
+      font-family:var(--mono);
+      font-size:14px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    /* Table */
+    .table{
+      color:var(--text);
+    }
+    .table thead th{
+      background:#fbfcff;
+      position:sticky;
+      top:0;
+      z-index:1;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      color:var(--muted);
+      border-bottom:1px solid var(--border);
+    }
+    .table td, .table th{
+      border-color:var(--border);
+    }
+
+    tr.new-row{
+      animation: pop 600ms ease;
+      box-shadow: 0 0 0 1px rgba(17, 24, 39, .06);
+    }
+    @keyframes pop{
+      0%{opacity:.35;transform:translateY(-10px);}
+      100%{opacity:1;transform:none;}
+    }
+
+    .badge-ok{
+      background: rgba(22,163,74,.12);
+      border:1px solid rgba(22,163,74,.55);
+      color: #166534;
+    }
+    .badge-warn{
+      background: rgba(245,158,11,.14);
+      border:1px solid rgba(245,158,11,.55);
+      color: #92400e;
+    }
+    .badge-err{
+      background: rgba(220,38,38,.14);
+      border:1px solid rgba(220,38,38,.55);
+      color: #991b1b;
+    }
+
+    /* Full-height columns */
+    .hfill{
+      min-height: calc(100vh - 140px); /* header + paddings (stima robusta) */
+    }
+
+    /* Log card: make table area fill remaining space */
+    .log-card{
+      display:flex;
+      flex-direction:column;
+    }
+    .scrollbox{
+      flex:1;
+      min-height: 0;       /* IMPORTANT per flex scroll */
+      overflow:auto;
+      border-radius:12px;
+    }
+
+    /* Make toast readable on light bg */
+    .toast.text-bg-danger{
+      background-color: var(--err) !important;
+    }
+  </style>
+</head>
+
+<body class="py-4">
+<div class="container page-wrap d-flex flex-column">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="mb-1">IDS Dashboard</h2>
+      <div class="muted">Flow-based intrusion alerts</div>
+    </div>
+    <div class="pill mono">
+      <span class="dot" id="statusDot"></span>
+      <span id="status">OFFLINE</span>
+    </div>
+  </div>
+
+  <!-- Two cards fill available height -->
+  <div class="row g-3 flex-grow-1">
+    <!-- LEFT: KPIs + Bars -->
+    <div class="col-lg-12 col-12 d-flex">
+      <div class="card p-3 w-100 d-flex flex-column">
+        <div class="kpi mb-3">
+          <div class="k">
+            <div class="label">Last update</div>
+            <div class="value mono" id="ts">-</div>
+          </div>
+          <div class="k">
+            <div class="label">Flow ID</div>
+            <div class="value mono" id="flowId">-</div>
+          </div>
+          <div class="k">
+            <div class="label">Model</div>
+            <div class="value mono" id="modelVersion">-</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between">
+            <span class="mono">Probability of Normal Traffic</span><span class="mono" id="p0v">-</span>
+          </div>
+          <div class="bar"><div id="p0b" style="background:var(--ok)"></div></div>
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between">
+            <span class="mono">Probability of Denial of Service Attacks</span><span class="mono" id="p1v">-</span>
+          </div>
+          <div class="bar"><div id="p1b" style="background:var(--err)"></div></div>
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between">
+            <span class="mono">Probability of Integirty Attacks</span><span class="mono" id="p2v">-</span>
+          </div>
+          <div class="bar"><div id="p2b" style="background:var(--warn)"></div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: EVENT LOG -->
+    <div class="col-lg-12 col-12 d-flex">
+      <div class="card p-3 w-100 log-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">Event log</h5>
+          <span class="muted small">Most recent on top</span>
+        </div>
+
+        <div class="scrollbox">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th style="width: 30%;">Time</th>
+                <th style="width: 20%;">Flow</th>
+                <th style="width: 10%;">Type</th>
+                <th style="width: 40%;">OK / DoS / Integrity</th>
+              </tr>
+            </thead>
+            <tbody id="eventsBody">
+              <tr id="emptyRow"><td colspan="4" class="muted">No events yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div id="threatToast" class="toast text-bg-danger border-0">
+    <div class="toast-body mono" id="toastMsg">IDS ALERT</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const toast = new bootstrap.Toast(document.getElementById("threatToast"), {delay:4000});
+  const eventsBody = document.getElementById("eventsBody");
+  const emptyRow  = document.getElementById("emptyRow");
+  const toastMsg  = document.getElementById("toastMsg");
+
+  // flow_id -> <tr>
+  const rowByFlow = new Map();
+
+  function fmt(x){ return typeof x==="number" ? x.toFixed(4) : "-"; }
+
+  function statusOf(p0,p1,p2){
+    if(p2>p0 && p2 > p1) return "Integrity";
+    if(p1>p0) return "DoS";
+    return "NORMAL";
+  }
+
+  function flowIdOf(d){
+    // fallback: se manca flow_id, usa qualcosa di stabile (o "-" e non loggare)
+    return d?.meta?.flow_id ?? "-";
+  }
+
+  function badgeClass(status){
+    return status==="DoS" ? "badge-err" : status==="Integrity" ? "badge-warn" : "badge-ok";
+  }
+
+  function setOnline(status){
+    const dot=document.getElementById("statusDot");
+    dot.style.background = status==="DoS" ? "var(--err)" : status==="Integrity" ? "var(--warn)" : "var(--ok)";
+    document.getElementById("status").textContent=status;
+  }
+
+  function upsertEventRow({ isoTime, flowId, status, p0, p1, p2 }){
+    // se è la prima riga, rimuovi placeholder
+    if (emptyRow) emptyRow.remove();
+
+    let tr = rowByFlow.get(flowId);
+
+    if(!tr){
+      tr = document.createElement("tr");
+      rowByFlow.set(flowId, tr);
+    }
+
+    // aggiorna contenuto
+    tr.innerHTML = `
+      <td class="mono">${isoTime}</td>
+      <td class="mono">${flowId}</td>
+      <td><span class="badge ${badgeClass(status)}">${status}</span></td>
+      <td class="mono">${fmt(p0)} / ${fmt(p1)} / ${fmt(p2)}</td>
+    `;
+
+    // animazione "pop" ad ogni update
+    tr.classList.remove("new-row");
+    void tr.offsetWidth; // reflow per ri-trigger animazione
+    tr.classList.add("new-row");
+
+    // porta in cima (most recent on top)
+    eventsBody.prepend(tr);
+  }
+
+  async function refresh(){
+    try{
+      const r = await fetch("/api/last",{cache:"no-store"});
+      const d = await r.json();
+
+      const p0 = d.p0 ?? 1;
+      const p1 = d.p1 ?? 0;
+      const p2 = d.p2 ?? 0;
+      const status = statusOf(p0,p1,p2);
+
+      const isoTime = (d.ts ? new Date(d.ts*1000) : new Date()).toISOString();
+      const flowId  = flowIdOf(d);
+
+      document.getElementById("ts").textContent = isoTime;
+      document.getElementById("flowId").textContent = flowId;
+      document.getElementById("modelVersion").textContent = d.model_version ?? "-";
+
+      document.getElementById("p0v").textContent=fmt(p0);
+      document.getElementById("p1v").textContent=fmt(p1);
+      document.getElementById("p2v").textContent=fmt(p2);
+
+      document.getElementById("p0b").style.width=(p0*100)+"%";
+      document.getElementById("p1b").style.width=(p1*100)+"%";
+      document.getElementById("p2b").style.width=(p2*100)+"%";
+
+      setOnline(status);
+
+      // logga SOLO se è warning/error (come prima)
+      if (flowId !== "-" && (p1>p0 || p2>p0)){
+        upsertEventRow({ isoTime, flowId, status, p0, p1, p2 });
+        toastMsg.textContent = `${status} | flow=${flowId}`;
+        toast.show();
+      }
+    }catch{
+      // silenzioso come prima
+    }
+  }
+
+  refresh();
+  setInterval(refresh,1000);
+</script>
+</body>
+</html>

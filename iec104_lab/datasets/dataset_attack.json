@@ -1,66 +1,14 @@
 [
-  {
-    "name": "burst_flip_sp_402_long",
-    "type": "burst_flip",
-    "targets": [402],
-    "start_sec": 60,
-    "end_sec": 1800,
-    "params": { "burst_period_sec": 0.1, "burst_count": 60 }
-  },
-  {
-    "name": "force1_sp_404_long",
-    "type": "flip",
-    "targets": [404],
-    "start_sec": 120,
-    "end_sec": 3600,
-    "params": { "mode": "force1" }
-  },
-  {
-    "name": "freeze_sp_407_long",
-    "type": "freeze",
-    "targets": [407],
-    "start_sec": 180,
-    "end_sec": 3600
-  },
+  { "ioa": 11,  "type": "SP", "init": 1, "toggle_sec": 2 },
+  { "ioa": 12,  "type": "SP", "init": 0, "toggle_sec": 2 },
+  { "ioa": 13,  "type": "SP", "init": 1, "toggle_sec": 2 },
+  { "ioa": 14,  "type": "SP", "init": 0, "toggle_sec": 2 },
+  { "ioa": 15,  "type": "SP", "init": 1, "toggle_sec": 2 },
 
-  {
-    "name": "ct_503_rollback_repeated",
-    "type": "rollback",
-    "targets": [503],
-    "start_sec": 120,
-    "end_sec": 3600,
-    "params": { "amount": 20000 }
-  },
-  {
-    "name": "ct_501_reset_repeated",
-    "type": "reset",
-    "targets": [501],
-    "start_sec": 300,
-    "end_sec": 3600,
-    "params": { "to": 0 }
-  },
-  {
-    "name": "ct_502_spike_long",
-    "type": "spike",
-    "targets": [502],
-    "start_sec": 240,
-    "end_sec": 3600,
-    "params": { "delta": 100000 }
-  },
-  {
-    "name": "ct_506_drift_big_long",
-    "type": "drift",
-    "targets": [506],
-    "start_sec": 120,
-    "end_sec": 3600,
-    "params": { "slope": 25.0 }
-  },
-  {
-    "name": "ct_505_clamp_low_long",
-    "type": "clamp",
-    "targets": [505],
-    "start_sec": 120,
-    "end_sec": 3600,
-    "params": { "min": 0, "max": 2500 }
-  }
+  { "ioa": 101, "type": "SP", "init": 0, "toggle_sec": 2 },
+  { "ioa": 102, "type": "SP", "init": 1, "toggle_sec": 2 },
+  { "ioa": 103, "type": "SP", "init": 0, "toggle_sec": 2 },
+
+  { "ioa": 201, "type": "SP", "init": 1, "toggle_sec": 2 },
+  { "ioa": 202, "type": "SP", "init": 0, "toggle_sec": 2 }
 ]

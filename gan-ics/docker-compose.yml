@@ -57,17 +57,22 @@ services:
       GEN_RATE_PER_MIN: "6"
       GEN_BURST: "2"
       FEATS_PATH: "/artifacts/features_three.json"
-      MGMT_DHCP: "0"
+      MGMT_DHCP: "1"
       GNS3_MODE: "0"  
       ICS_DHCP: "0"
       ICS_PROMISC: "1"
-      OUT_JSONL_PATH: "/data/flows.jsonl"         
+      OUT_JSONL_PATH: "/data/flows.jsonl"
+      DASH_PORT: "8080"     
+      MGMT_NAT: "1"
+      MGMT_IP_CIDR: "192.168.122.50/24"
     cap_add: ["NET_ADMIN", "NET_RAW"]
     volumes:
       - ./out_pipeline/artifacts:/artifacts:ro
     networks:
       - mgmt
       - ics
+    ports:
+      - "8080:8080"
 
 networks:
   mgmt:

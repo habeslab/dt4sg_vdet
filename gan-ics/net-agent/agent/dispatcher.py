@@ -8,6 +8,8 @@ import threading
 import queue as _queue
 import requests
 from datetime import datetime, timezone, timedelta
+from agent.dashboard_state import set_last
+
 try:
     from zoneinfo import ZoneInfo  # Python 3.9+
     TZ_LOCAL = ZoneInfo("Europe/Rome")
@@ -147,6 +149,9 @@ class Dispatcher:
         # --- Chiamata al disc-api + rtt http ---
         t0 = time.time()
         resp = self._post_predict(features, meta)
+        
+
+        set_last(resp)
         t1 = time.time()
         rtt_ms = int(max(0, round((t1 - t0) * 1000)))
 
