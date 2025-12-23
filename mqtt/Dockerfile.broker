@@ -1,0 +1,12 @@
+FROM eclipse-mosquitto:2.0
+
+# Copia configurazione custom
+COPY mosquitto.conf /mosquitto/config/mosquitto.conf
+COPY entrypoint-broker.sh /entrypoint.sh
+
+# Permessi
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 1883
+
+ENTRYPOINT ["/entrypoint.sh"]

@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  broker:
+    container_name: mqtt-dt4sg
+    image: mqtt-dt4sg:latest      
+    build:
+      context: .              
+      dockerfile: Dockerfile.broker
+    environment:
+      - IP_BROKER=192.168.122.49/24
+    networks:
+      - mqtt_net
+  mqtt-replicator:
+    image: mqtt-replicator:latest
+    container_name: mqtt_replicator
+    build:
+      context: .
+      dockerfile: Dockerfile.mqtt-replicator
+    environment:
+      - MQTT_HOST=192.168.122.49
+      - MQTT_PORT=1883
+      - MQTT_TOPIC=sg/packets/#
+      - IFACE=eth0
+      - IP_IFACE=192.168.122.48/24
+      - REPLICATION_IFACE=eth1
+      - IP_REPLICATION_IFACE=10.0.0.88/24
+      - DELAY_FACTOR=1.0
+      - LOGLEVEL=INFO
+    restart: unless-stopped
+    networks:
+      - mqtt_net
+
+
+networks:
+  mqtt_net:
+    driver: bridge

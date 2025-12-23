@@ -1,0 +1,49 @@
+# Base image leggera e multi-arch
+FROM python:3.11-slim
+
+# --------------------------------------------------
+# Variabili di ambiente di default (override da compose)
+# --------------------------------------------------
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    LOGLEVEL=INFO \
+    MQTT_PORT=1883 \
+    MQTT_TOPIC=sg/packets/# \
+    IFACE=eth0 \
+    REPLICATION_IFACE=eth1 \
+    DELAY_FACTOR=1.0
+
+# --------------------------------------------------
+# Dipendenze di sistema (necessarie a scapy)
+# --------------------------------------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tcpdump \
+    iproute2 \
+    libpcap0.8 \
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+# --------------------------------------------------
+# Dipendenze Python
+# --------------------------------------------------
+RUN pip install --no-cache-dir \
+    scapy>=2.6.0 \
+    paho-mqtt
+
+# --------------------------------------------------
+# Directory di lavoro
+# --------------------------------------------------
+WORKDIR /app
+
+# --------------------------------------------------
+# Copia dello script
+# --------------------------------------------------
+COPY mqtt_replay.py /app/mqtt_replay.py
+
+COPY entrypoint-mqtt-replicator.sh /entrypoint-mqtt-replicator.sh
+RUN chmod +x /entrypoint-mqtt-replicator.sh
+
+# --------------------------------------------------
+# Entry point
+# --------------------------------------------------
+ENTRYPOINT ["/entrypoint-mqtt-replicator.sh"]

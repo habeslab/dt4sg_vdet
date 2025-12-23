@@ -26,6 +26,7 @@ except Exception:
 # Logging
 # =========================
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+EXPERIMENT = os.getenv("EXPERIMENT", "")
 logging.basicConfig(
     level=getattr(logging, LOG_LEVEL, logging.INFO),
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -49,7 +50,7 @@ FEATS_PATH  = os.getenv("FEATS_PATH", f"{ARTIFACTS_DIR}/features_three.json")
 # es: "benign,malicious,synthetic"
 CLASS_ORDER_ENV = os.getenv("CLASS_ORDER", "0,1,2")
 
-PRED_CSV_PATH = os.getenv("PRED_CSV_PATH", f"{ARTIFACTS_DIR}/predictions_log.csv")
+PRED_CSV_PATH = os.getenv("PRED_CSV_PATH", f"{ARTIFACTS_DIR}/predictions_log_experiment_{EXPERIMENT}.csv")
 
 # =========================
 # Util: features.json loader

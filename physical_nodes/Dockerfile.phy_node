@@ -1,0 +1,38 @@
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    LOGLEVEL=DEBUG \
+    MQTT_HOST=192.168.122.49 \
+    MQTT_PORT=1883 \
+    MQTT_TOPIC=sg/packets/iec104 \
+    SRC_IP=10.0.0.200 \
+    DST_IP=10.0.0.11 \
+    SRC_PORT=40000 \
+    DST_PORT=2404 \
+    SRC_MAC=02:00:00:00:00:aa \
+    DST_MAC=ff:ff:ff:ff:ff:ff \
+    MODE=U_STARTDT \
+    COUNT=0 \ 
+    N_NODES=10 \ 
+    RATE_HZ=5 \
+    MODE=I_DUMMY
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tcpdump \
+    iproute2 \
+    libpcap0.8 \
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir \
+    scapy>=2.6.0 \
+    paho-mqtt
+
+WORKDIR /app
+COPY phy_node.py /app/phy_node.py
+COPY multi_phy_node.py /app/multi_phy_node.py
+COPY entrypoint-phy-node.sh /app/entrypoint-phy-node.sh
+RUN chmod +x /app/entrypoint-phy-node.sh
+
+ENTRYPOINT ["/app/entrypoint-phy-node.sh"]

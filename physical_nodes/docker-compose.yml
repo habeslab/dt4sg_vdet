@@ -1,0 +1,85 @@
+services:
+  phy-node-1:
+    build:
+      context: .
+      dockerfile: Dockerfile.phy_node
+    container_name: phy-node-1
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      - IP_NODE=192.168.122.40/24
+      - MQTT_HOST=192.168.122.49
+      - MQTT_PORT=1883
+      - MQTT_TOPIC=sg/packets/iec104
+      - SRC_IP=10.0.0.200
+      - DST_IP=10.0.0.10
+      - SRC_PORT=40000
+      - DST_PORT=2404
+      - SRC_MAC=02:00:00:00:00:aa
+      - DST_MAC=ff:ff:ff:ff:ff:ff
+      - MODE=I_DUMMY
+      - COUNT=0
+      - LOGLEVEL=INFO
+      - N_NODES=50 
+      - RATE_HZ=5
+      - MODE=I_DUMMY
+    restart: unless-stopped
+    networks:
+      - mqtt_net
+  phy-node-2:
+    build:
+      context: .
+      dockerfile: Dockerfile.phy_node
+    container_name: phy-node-2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      - IP_NODE=192.168.122.39/24
+      - MQTT_HOST=192.168.122.49
+      - MQTT_PORT=1883
+      - MQTT_TOPIC=sg/packets/iec104
+      - SRC_IP=10.0.0.200
+      - DST_IP=10.0.0.10
+      - SRC_PORT=40000
+      - DST_PORT=2404
+      - SRC_MAC=02:00:00:00:00:aa
+      - DST_MAC=ff:ff:ff:ff:ff:ff
+      - MODE=I_DUMMY
+      - RATE_HZ=5
+      - COUNT=0
+      - LOGLEVEL=INFO
+    restart: unless-stopped
+    networks:
+      - mqtt_net
+  phy-node-3:
+    build:
+      context: .
+      dockerfile: Dockerfile.phy_node
+    container_name: phy-node-3
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      - IP_NODE=192.168.122.38/24
+      - MQTT_HOST=192.168.122.49
+      - MQTT_PORT=1883
+      - MQTT_TOPIC=sg/packets/iec104
+      - SRC_IP=10.0.0.200
+      - DST_IP=10.0.0.10
+      - SRC_PORT=40000
+      - DST_PORT=2404
+      - SRC_MAC=02:00:00:00:00:aa
+      - DST_MAC=ff:ff:ff:ff:ff:ff
+      - MODE=I_DUMMY
+      - RATE_HZ=5
+      - COUNT=0
+      - LOGLEVEL=INFO
+    restart: unless-stopped
+    networks:
+      - mqtt_net
+
+networks:
+  mqtt_net:
+    driver: bridge
