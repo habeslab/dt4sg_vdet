@@ -20,33 +20,33 @@ The entire lab runs on **Docker Compose** (or can be imported into **GNS3**) and
 
 | Container/Role   | Hostname         | IPv4      | Function                                         |
 | ---------------- | ---------------- | --------- | ------------------------------------------------ |
-| **Master / HMI** | `master`         | 10.0.0.11 | Polls RTUs, issues set-points & commands         |
-| **RTU Power**    | `rtu_power`      | 10.0.0.12 | Conventional thermal power plant                 |
-| **RTU Factory**  | `rtu_factory`    | 10.0.0.13 | Heavy-industrial load                            |
-| **RTU Suburb**   | `rtu_suburb`     | 10.0.0.14 | Residential feeders + battery storage            |
-| **RTU Solar**    | `rtu_solar`      | 10.0.0.15 | Utility-scale photovoltaic farm                  |
-| **RTU Wind**     | `rtu_wind`       | 10.0.0.16 | On-shore wind farm                               |
-| **RTU Industry** | `rtu_industry`   | 10.0.0.17 | Industrial prosumer (generates & consumes)       |
-| **RTU EV**       | `rtu_ev`         | 10.0.0.18 | EV fast-charging station                         |
-| **Suricata IDS** | `ids` (host net) | —         | OT-aware intrusion detection system              |
-| **Attacker**     | `attacker`       | 10.0.0.99 | Kali-like red-team box for adversarial scenarios |
-| **NET-AGENT**    | `net-agent`      | 10.0.0.20 | GAN generator & sniffer                          |
-| **NET-DISC**     | `disc-api`       | 10.0.0.21 | GAN discriminator REST API                       |
+| __Master / HMI__ | `master`         | 10.0.0.11 | Polls RTUs, issues set-points & commands         |
+| __RTU Power__    | `rtu_power`      | 10.0.0.12 | Conventional thermal power plant                 |
+| __RTU Factory__  | `rtu_factory`    | 10.0.0.13 | Heavy-industrial load                            |
+| __RTU Suburb__   | `rtu_suburb`     | 10.0.0.14 | Residential feeders + battery storage            |
+| __RTU Solar__    | `rtu_solar`      | 10.0.0.15 | Utility-scale photovoltaic farm                  |
+| __RTU Wind__     | `rtu_wind`       | 10.0.0.16 | On-shore wind farm                               |
+| __RTU Industry__ | `rtu_industry`   | 10.0.0.17 | Industrial prosumer (generates & consumes)       |
+| __RTU EV__       | `rtu_ev`         | 10.0.0.18 | EV fast-charging station                         |
+| __Suricata IDS__ | `ids` (host net) | —         | OT-aware intrusion detection system              |
+| __Attacker__     | `attacker`       | 10.0.0.99 | Kali-like red-team box for adversarial scenarios |
+| __NET-AGENT__    | `net-agent`      | 10.0.0.20 | GAN generator & sniffer                          |
+| __NET-DISC__     | `disc-api`       | 10.0.0.21 | GAN discriminator REST API                       |
 
 ---
 
 ## 1.1 Protocol Stack
 
 * **IEC 60870-5-104** over TCP (default **2404/tcp**).
-* Optional **TLS** termination (disabled by default; enable via `ENABLE_TLS=true`).
+* Optional __TLS__ termination (disabled by default; enable via `ENABLE_TLS=true`).
 * **JSON** log streams following the *EVE* schema (Suricata).
 
 Each RTU periodically emits:
 
-* **Spontaneous** single-point / analog updates (*M\_SP\_NA\_1*, *M\_ME\_NA\_1*).
-* **Periodic** counter increments (*M\_CNT\_RC\_1*).
+* __Spontaneous__ single-point / analog updates (_M\_SP\_NA\_1_, _M\_ME\_NA\_1_).
+* __Periodic__ counter increments (_M\_CNT\_RC\_1_).
 
-The Master executes a **General Interrogation** (*C\_IC\_NA\_1*) every 30 s (configurable) and processes set-point commands received via an internal CLI or REST endpoint.
+The Master executes a __General Interrogation__ (_C\_IC\_NA\_1_) every 30 s (configurable) and processes set-point commands received via an internal CLI or REST endpoint.
 
 The Attacker container can craft malformed ASDUs or flood the network using `attack.sh` or replay PCAP datasets.
 
@@ -84,54 +84,20 @@ The Attacker container can craft malformed ASDUs or flood the network using `att
 
 ---
 
-## 2. GAN Integration
+## 2. ML Integration
 
-The project introduces a **Generative Adversarial Network (GAN)**:
+The project introduces a **ML-based IDS**:
 
-* **NET-AGENT (Generator)** — captures IEC-104 flows and generates synthetic feature vectors.
-* **NET-DISC (Discriminator)** — FastAPI service classifying flows into *benign*, *malicious*, *synthetic*.
-
-**Loss Functions:**
-
-* Generator:
-
-$$
-L_{GEN} = -\mathbb{E}_{z \sim p_z} [\log D(G(z))]
-$$
-
-* Discriminator:
-
-$$
-L_{DISC} = - E_{x \sim p_{data}} [\log p_{label}(x)] - E_{z \sim p_z} [\log (1 - p_{synthetic}(G(z)))]
-$$
-
-
-
-**Operational Policy:**
-
-* If $p_2 \geq \tau_{fake}$ ⇒ label = *synthetic*
-* Else if $\frac{p_1}{p_0+p_1} \geq \tau_{mal}$ ⇒ label = *malicious*, otherwise *benign*.
+* **Net-Agent** — captures IEC-104 flows and aggregates packets.
+* **ML/XAI Layer** — FastAPI service classifying flows into *Normal*, *Integrity*, *Availability* (attacks).
 
 ### Monitoring NET-AGENT Logs
 
 To inspect how the agent discriminates flows and forwards them to NET-DISC:
 
 ```bash
-docker exec -it "net-agent" bash -lc 'ls -lh /data; tail -F /data/flows.jsonl 2>/dev/null | grep -a --line-buffered "flow_id"'
+docker logs -it "net-agent"
 ```
-
-This command lists the JSONL logs and continuously streams classification results (`origin`, `label`, probabilities).
-
-### Enabling the Generator
-
-By default NET-AGENT operates in sniffer-only mode. To activate the GAN-based generator, set the environment variable:
-
-```yaml
-environment:
-  - GEN_ENABLED=1
-```
-
-This enables the generation of synthetic feature vectors, which are dispatched alongside real traffic to NET-DISC.
 
 ---
 
@@ -147,35 +113,33 @@ This enables the generation of synthetic feature vectors, which are dispatched a
 
 ```bash
 cd iec104_lab
-docker-compose build --no-cache
-docker-compose up -d
+docker compose build
 
 cd gan-ics
-docker-compose up -d
+docker compose build
+
+cd mqtt
+docker compose build
+
+cd physical_nodes
+docker compose build
 ```
 
 ---
 
 ## 4. Importing the Twin into GNS3
 
-The laboratory integrates with GNS3 in two flavours:
-
-* **Docker Compose Import** — GNS3 parses docker-compose.yml and spawns the corresponding nodes.
-* **Portable Project** — import a single .gns3project archive that embeds all images.
-
-Consult the guides below for step-by-step instructions:
-
-* [docs/import\_compose.md](iec104_lab/docs/import_compose.md)
-* [docs/import\_portable.md](iec104_lab/docs/import_portable.md)
+To start up the simulation environment into GNS3, you need to import the image file (`gns3/dt4sg.gns3project`), and then to associate the docker images with the nodes. At this stage, if you don't have previously build the docker images, you might fail in having the association working.
 
 ---
 
 ## 5. Launching Attack Scenarios
 
-The **attacker** container provides `/attack.sh`, which guides you through available IEC-104 penetration tests:
+Once inialized the simulation, the **attacker** container provides `/attack.sh`, which guides you through available IEC-104 penetration tests:
 
 ```bash
-docker compose exec attacker /attack.sh
+docker exec "attacker" bash 
+./attack.sh
 ```
 
 **Menu options:**
@@ -193,31 +157,5 @@ docker compose exec attacker /attack.sh
 | `IFACE`        | `eth0`  | Interface for replay.            |
 
 ---
-
-## 6. Repository Structure
-
-```
-iec104_lab/
- ├── docker/           # RTU, Master, IDS, Attacker, Suricata
- ├── docs/             # Topology, guides
- └── project_portable/ # GNS3 portable project
-
-gan-ics/
- ├── disc-api/         # Discriminator FastAPI
- ├── net-agent/        # Sniffer & Generator
- └── src/              # GAN training, preprocessing
-
-utils/                 # Support Script
-
-```
-
----
-
-## 7. References
-
-* Goodfellow et al. (2014) — *Generative Adversarial Nets*.
-* IEC 60870-5-104 Standard.
-* Mirsky et al. (2018) — *ICS Security & Anomaly Detection*.
-* Digital Twin applications in Smart Grid Security.
 
 
