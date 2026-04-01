@@ -1,20 +1,9 @@
-# Digital Twin for Vulnerability Detection in Smart Grid
-
-> A comprehensive digital twin of an OT/ICS substation enhanced with a ML-based IDS for anomaly detection.
+# Explainable Security Monitoring for Smart Grid Infrastructures via a Network Digital Twin
+### A comprehensive digital twin of an OT/ICS substation enhanced with a ML-based IDS for anomaly detection.
 
 ---
 
-## 1. Purpose & Scope
-
-This repository provides a reproducible, container-based digital twin of a medium-voltage electrical substation and its connected assets, extended with an **AI-driven GAN architecture**.
-
-**Core objectives**
-
-* **OT skill-building** — generate authentic IEC-104 traffic without risking live equipment.
-* **Security assessment** — validate IDS signatures, detection use-cases and red-team playbooks in a safe sandbox.
-* **GAN-based intrusion detection** — evaluate adversarial learning using NET-AGENT and NET-DISC.
-* **Renewable integration** — model the effect of solar, wind and EV fast-charging on grid stability.
-* **Rapid prototyping** — iterate on HMI/SCADA logic before field deployment.
+This repository provides a reproducible, container-based architecture for the monitoring and simulation of a Smart Grid infrastructure and its connected assets, extended with a ML-based and XAI architecture.
 
 The entire lab runs on **Docker Compose** (or can be imported into **GNS3**) and is made of the following nodes:
 
@@ -30,8 +19,8 @@ The entire lab runs on **Docker Compose** (or can be imported into **GNS3**) and
 | __RTU EV__       | `rtu_ev`         | 10.0.0.18 | EV fast-charging station                         |
 | __Suricata IDS__ | `ids` (host net) | —         | OT-aware intrusion detection system              |
 | __Attacker__     | `attacker`       | 10.0.0.99 | Kali-like red-team box for adversarial scenarios |
-| __NET-AGENT__    | `net-agent`      | 10.0.0.20 | GAN generator & sniffer                          |
-| __NET-DISC__     | `disc-api`       | 10.0.0.21 | GAN discriminator REST API                       |
+| __NET-AGENT__    | `net-agent`      | 10.0.0.20 | Serves as ML-based classifier
+| __NET-DISC__     | `disc-api`       | 10.0.0.21 | REST API invoking the net agent                       |
 
 ---
 
