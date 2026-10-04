@@ -1,0 +1,17 @@
+# Public UOWM IEC 60870-5-104 dataset (raw captures and archives, ~9 GB)
+2020*_UOWM_IEC104_Dataset_*/
+Balanced_IEC104_Train_Test_CSV_Files/
+*.7z
+*.pcap
+
+# Large serialized models / explainers
+*.joblib
+*.pt
+
+# Raw merged flow table (57 MB), regenerable from the UOWM captures
+merged_network_flow_leayer.csv
+
+# Jupyter
+.ipynb_checkpoints/
+checkpoints
+logs

@@ -1,0 +1,13 @@
+{
+  "input_csv": "/home/habes/NotebookProjects/bboi/SmartGrid/merged_network_flow_leayer.csv",
+  "out_dir": "/home/habes/NotebookProjects/bboi/SmartGrid",
+  "label_col": "Label",
+  "n_rows": 35006,
+  "n_features_full": 112,
+  "train_size": 28004,
+  "val_size": 7002,
+  "malign_rate_train": 0.7433223825167833,
+  "malign_rate_val": 0.7432162239360183,
+  "topk_plot": 15,
+  "select_topk": 15
+}

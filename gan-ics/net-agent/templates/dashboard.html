@@ -9,41 +9,114 @@
 
   <style>
     :root{
-      /* Light theme */
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --border:#d9deea;
-      --text:#111827;
-      --muted:#5b647a;
-
-      --ok:#16a34a;
-      --warn:#f59e0b;
-      --err:#dc2626;
-
-      --barbg:#e8ecf6;
-      --pillbg:#f2f4fa;
-
-      --shadow: 0 10px 30px rgba(17, 24, 39, .08);
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --bg0:#08111f;
+      --bg1:#10192e;
+      --card:#0e172a;
+      --card2:#121d33;
+      --border:rgba(177, 194, 231, .15);
+      --text:#f4f7fb;
+      --muted:#94a3bf;
+      --ok:#34d399;
+      --warn:#fbbf24;
+      --err:#fb7185;
+      --barbg:rgba(255,255,255,.08);
+      --pillbg:rgba(255,255,255,.06);
+      --shadow: 0 20px 45px rgba(0, 0, 0, .35);
+      --mono:"SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      --display:"Trebuchet MS", "Segoe UI", sans-serif;
     }
 
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
     body{
-      background:var(--bg);
-      color:var(--text);
+      color:#ffffff;
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,.24), transparent 26%),
+        radial-gradient(circle at top right, rgba(16,185,129,.16), transparent 22%),
+        radial-gradient(circle at bottom left, rgba(251,191,36,.09), transparent 24%),
+        linear-gradient(160deg, var(--bg0), var(--bg1));
+      background-attachment: fixed;
     }
 
     .page-wrap{
-      min-height: calc(100vh - 2rem); /* body py-4 = 2rem sopra/sotto */
+      min-height: calc(100vh - 2rem);
+      position: relative;
+      z-index: 1;
     }
 
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:16px;
+    .page-wrap::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(circle at center, black 35%, transparent 86%);
+      opacity: .55;
+    }
+
+    .shell{
+      max-width: 1440px;
+    }
+
+    .hero{
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      backdrop-filter: blur(12px);
       box-shadow: var(--shadow);
+      overflow: hidden;
     }
 
-    .muted{ color:var(--muted); }
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:-2px -2px auto auto;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(59,130,246,.28), transparent 68%);
+      pointer-events:none;
+    }
+
+    .hero-inner{
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow{
+      color: rgba(255,255,255,.75);
+      font-size: .78rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    .title{
+      font-family: var(--display);
+      font-size: clamp(2rem, 3vw, 3.25rem);
+      line-height: .95;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle{
+      color: rgba(255,255,255,.78);
+      max-width: 64ch;
+    }
+
+    .metric-card,
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--border);
+      border-radius:20px;
+      box-shadow: var(--shadow);
+      color: #ffffff;
+    }
+
+    .muted{ color:rgba(255,255,255,.72); }
     .mono{ font-family:var(--mono); }
 
     .pill{
@@ -59,65 +132,124 @@
     .dot{
       width:10px;height:10px;border-radius:50%;
       display:inline-block;
+      box-shadow: 0 0 0 5px rgba(255,255,255,.03);
     }
 
     .bar{
-      height:10px;
+      height:12px;
       border-radius:999px;
       background:var(--barbg);
       overflow:hidden;
-      border:1px solid var(--border);
+      border:1px solid rgba(255,255,255,.10);
     }
     .bar>div{ height:100%; }
 
     .kpi{
       display:grid;
-      grid-template-columns:repeat(3,1fr);
+      grid-template-columns:repeat(2,minmax(0,1fr));
       gap:12px;
     }
     .kpi .k{
-      background:#fbfcff;
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:10px 12px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:12px 14px;
+      min-height: 84px;
+      min-width: 0;
+    }
+
+    .kpi .k-wide{
+      grid-column: 1 / -1;
     }
     .k .label{
-      font-size:12px;
-      color:var(--muted);
+      font-size:11px;
+      color:rgba(255,255,255,.68);
       text-transform:uppercase;
       letter-spacing:.04em;
     }
     .k .value{
       margin-top:4px;
       font-family:var(--mono);
-      font-size:14px;
+      font-size:12px;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
+      color:#ffffff;
+      min-width:0;
     }
 
-    /* Table */
+    .value-xl{
+      font-family: var(--display);
+      font-size: 2.25rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .panel-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom: 1rem;
+    }
+
+    .snapshot{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top: 1rem;
+    }
+
+    .snapshot .stat{
+      flex:1 1 160px;
+      min-width:0;
+      padding:12px 14px;
+      border-radius:16px;
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .snapshot .stat .label{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:rgba(255,255,255,.68);
+    }
+
+    .snapshot .stat .value{
+      margin-top:6px;
+      font-family:var(--mono);
+      font-size:13px;
+      color:#ffffff;
+    }
+
     .table{
-      color:var(--text);
+      color:#ffffff;
+    }
+    .table > :not(caption) > * > *{
+      color:#ffffff !important;
+      background-color: transparent !important;
     }
     .table thead th{
-      background:#fbfcff;
+      background: rgba(255,255,255,.05);
       position:sticky;
       top:0;
       z-index:1;
-      font-size:12px;
+      font-size:11px;
       text-transform:uppercase;
       letter-spacing:.04em;
-      color:var(--muted);
+      color:#ffffff !important;
       border-bottom:1px solid var(--border);
     }
     .table td, .table th{
-      border-color:var(--border);
+      border-color: rgba(255,255,255,.08);
+      background: transparent;
+      color:#ffffff !important;
     }
 
     tr.new-row{
       animation: pop 600ms ease;
-      box-shadow: 0 0 0 1px rgba(17, 24, 39, .06);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.06);
     }
     @keyframes pop{
       0%{opacity:.35;transform:translateY(-10px);}
@@ -125,133 +257,307 @@
     }
 
     .badge-ok{
-      background: rgba(22,163,74,.12);
-      border:1px solid rgba(22,163,74,.55);
-      color: #166534;
+      background: rgba(52,211,153,.12);
+      border:1px solid rgba(52,211,153,.55);
+      color: #8ef2bf;
     }
     .badge-warn{
-      background: rgba(245,158,11,.14);
-      border:1px solid rgba(245,158,11,.55);
-      color: #92400e;
+      background: rgba(251,191,36,.14);
+      border:1px solid rgba(251,191,36,.55);
+      color: #fde68a;
     }
     .badge-err{
-      background: rgba(220,38,38,.14);
-      border:1px solid rgba(220,38,38,.55);
-      color: #991b1b;
+      background: rgba(251,113,133,.14);
+      border:1px solid rgba(251,113,133,.55);
+      color: #fecdd3;
     }
 
-    /* Full-height columns */
     .hfill{
-      min-height: calc(100vh - 140px); /* header + paddings (stima robusta) */
+      min-height: calc(100vh - 170px);
     }
 
-    /* Log card: make table area fill remaining space */
     .log-card{
       display:flex;
       flex-direction:column;
     }
     .scrollbox{
       flex:1;
-      min-height: 0;       /* IMPORTANT per flex scroll */
+      min-height: 0;
       overflow:auto;
       border-radius:12px;
     }
 
-    /* Make toast readable on light bg */
     .toast.text-bg-danger{
       background-color: var(--err) !important;
+    }
+
+    .small-chip{
+      padding:.3rem .55rem;
+      font-size:.78rem;
+      letter-spacing:.02em;
+    }
+
+    .flow-card{
+      min-height: 320px;
+    }
+
+    .flow-graph-wrap{
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      overflow:hidden;
+      padding: 8px;
+    }
+
+    .flow-graph{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
+    .flow-edge{
+      fill:none;
+      stroke: rgba(255,255,255,.28);
+      stroke-width: 5;
+      stroke-linecap: round;
+      transition: stroke .2s ease, opacity .2s ease;
+    }
+
+    .flow-edge.active{
+      stroke: var(--ok);
+      opacity: .95;
+      filter: drop-shadow(0 0 10px rgba(52,211,153,.35));
+    }
+
+    .flow-node{
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,.35));
+    }
+
+    .flow-node circle{
+      fill: rgba(255,255,255,.08);
+      stroke: rgba(255,255,255,.24);
+      stroke-width: 2;
+      transition: fill .2s ease, stroke .2s ease;
+    }
+
+    .flow-node.active circle{
+      stroke: var(--ok);
+      fill: rgba(52,211,153,.12);
+    }
+
+    .flow-node text{
+      fill: #ffffff;
+      font-family: var(--mono);
+    }
+
+    .flow-node .node-name{
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+
+    .flow-node .node-sub{
+      font-size: 13px;
+      fill: rgba(255,255,255,.72);
+    }
+
+    .flow-path-label{
+      font-size: 15px;
+      fill: rgba(255,255,255,.82);
+    }
+
+    @media (max-width: 991.98px){
+      .title{ font-size: 2rem; }
+      .kpi{ grid-template-columns: 1fr; }
+      .panel-head{ flex-direction: column; }
+      .hfill{ min-height: auto; }
+      .scrollbox{ max-height: 58vh; }
     }
   </style>
 </head>
 
 <body class="py-4">
-<div class="container page-wrap d-flex flex-column">
+<div class="container shell page-wrap d-flex flex-column">
 
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h2 class="mb-1">IDS Dashboard</h2>
-      <div class="muted">Flow-based intrusion alerts</div>
-    </div>
-    <div class="pill mono">
-      <span class="dot" id="statusDot"></span>
-      <span id="status">OFFLINE</span>
+  <div class="hero p-4 p-lg-5 mb-3">
+    <div class="hero-inner">
+      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
+        <div>
+          <div class="eyebrow mb-2">Network Digital Twin</div>
+          <div class="title">IDS Dashboard</div>
+          <p class="subtitle mt-3 mb-0">
+            Flow-based intrusion alerts with live probability bars and a compact event log for quick triage.
+          </p>
+        </div>
+        <div class="text-lg-end">
+          <div class="pill mono mb-2">
+            <span class="dot" id="statusDot"></span>
+            <span id="status">OFFLINE</span>
+          </div>
+          <div class="muted small mono" id="statusDetail">Waiting for the first flow update</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Two cards fill available height -->
-  <div class="row g-3 flex-grow-1">
-    <!-- LEFT: KPIs + Bars -->
-    <div class="col-lg-12 col-12 d-flex">
-      <div class="card p-3 w-100 d-flex flex-column">
+  <div class="row g-3 flex-grow-1 hfill">
+    <div class="col-xl-4 d-flex">
+      <div class="metric-card p-4 w-100 d-flex flex-column">
+        <div class="panel-head">
+          <div>
+            <div class="eyebrow mb-1">Current snapshot</div>
+            <div class="value-xl mono" id="flowScore">--</div>
+          </div>
+          <div class="text-end">
+            <div class="pill small-chip mono mb-2">
+              <span class="dot" id="statusDotMini"></span>
+              <span id="statusMini">OFFLINE</span>
+            </div>
+            <div class="muted small mono">Latest classification</div>
+          </div>
+        </div>
+
         <div class="kpi mb-3">
           <div class="k">
             <div class="label">Last update</div>
-            <div class="value mono" id="ts">-</div>
+            <div class="value" id="ts">-</div>
           </div>
           <div class="k">
             <div class="label">Flow ID</div>
-            <div class="value mono" id="flowId">-</div>
+            <div class="value" id="flowId">-</div>
           </div>
           <div class="k">
             <div class="label">Model</div>
-            <div class="value mono" id="modelVersion">-</div>
+            <div class="value" id="modelVersion">-</div>
+          </div>
+        </div>
+
+        <div class="snapshot mb-4">
+          <div class="stat">
+            <div class="label">Traffic</div>
+            <div class="value mono" id="trafficLabel">Normal</div>
+          </div>
+          <div class="stat">
+            <div class="label">Alert weight</div>
+            <div class="value mono" id="alertLabel">0.0000</div>
+          </div>
+          <div class="stat">
+            <div class="label">Confidence</div>
+            <div class="value mono" id="confidenceLabel">100%</div>
           </div>
         </div>
 
         <div class="mb-3">
-          <div class="d-flex justify-content-between">
-            <span class="mono">Probability of Normal Traffic</span><span class="mono" id="p0v">-</span>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="mono">Normal traffic</span><span class="mono" id="p0v">-</span>
           </div>
-          <div class="bar"><div id="p0b" style="background:var(--ok)"></div></div>
+          <div class="bar"><div id="p0b" style="background:linear-gradient(90deg,var(--ok),#86efac)"></div></div>
         </div>
 
         <div class="mb-3">
-          <div class="d-flex justify-content-between">
-            <span class="mono">Probability of Denial of Service Attacks</span><span class="mono" id="p1v">-</span>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="mono">Denial of service</span><span class="mono" id="p1v">-</span>
           </div>
-          <div class="bar"><div id="p1b" style="background:var(--err)"></div></div>
+          <div class="bar"><div id="p1b" style="background:linear-gradient(90deg,var(--err),#fda4af)"></div></div>
         </div>
 
-        <div class="mb-3">
-          <div class="d-flex justify-content-between">
-            <span class="mono">Probability of Integirty Attacks</span><span class="mono" id="p2v">-</span>
+        <div class="mb-2">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="mono">Integrity attacks</span><span class="mono" id="p2v">-</span>
           </div>
-          <div class="bar"><div id="p2b" style="background:var(--warn)"></div></div>
+          <div class="bar"><div id="p2b" style="background:linear-gradient(90deg,var(--warn),#fde68a)"></div></div>
         </div>
-
       </div>
     </div>
 
-    <!-- RIGHT: EVENT LOG -->
-    <div class="col-lg-12 col-12 d-flex">
-      <div class="card p-3 w-100 log-card">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h5 class="mb-0">Event log</h5>
-          <span class="muted small">Most recent on top</span>
+    <div class="col-xl-8 d-flex">
+      <div class="card p-4 w-100 log-card">
+        <div class="panel-head mb-2">
+          <div>
+            <div class="eyebrow mb-1">Event stream</div>
+            <h5 class="mb-0">Recent packets</h5>
+          </div>
+          <div class="muted small">Most recent update on top</div>
         </div>
 
         <div class="scrollbox">
           <table class="table table-sm align-middle mb-0">
             <thead>
               <tr>
-                <th style="width: 30%;">Time</th>
+                <th style="width: 28%;">Time</th>
                 <th style="width: 20%;">Flow</th>
-                <th style="width: 10%;">Type</th>
-                <th style="width: 40%;">OK / DoS / Integrity</th>
+                <th style="width: 14%;">Type</th>
+                <th style="width: 38%;">P0 / P1 / P2</th>
               </tr>
             </thead>
             <tbody id="eventsBody">
-              <tr id="emptyRow"><td colspan="4" class="muted">No events yet.</td></tr>
+              <tr id="emptyRow"><td colspan="4" class="muted py-4">No events yet.</td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- TOAST -->
+  <div class="row g-3 mt-1">
+    <div class="col-12">
+      <div class="card p-4 flow-card">
+        <div class="panel-head mb-3">
+          <div>
+            <div class="eyebrow mb-1">Traffic map</div>
+            <h5 class="mb-0">Packet journey</h5>
+          </div>
+          <div class="muted small mono" id="graphSummary">Waiting for flow data</div>
+        </div>
+
+        <div class="flow-graph-wrap">
+          <svg class="flow-graph" viewBox="0 0 1200 280" preserveAspectRatio="xMidYMid meet" aria-label="Traffic flow graph" role="img">
+            <defs>
+              <marker id="arrowHead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L12,6 L0,12 z" fill="rgba(255,255,255,.45)"></path>
+              </marker>
+              <marker id="arrowHeadActive" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L12,6 L0,12 z" fill="var(--ok)"></path>
+              </marker>
+            </defs>
+
+            <text x="600" y="28" text-anchor="middle" class="flow-path-label" id="graphTitle">Observed flow path</text>
+            <text x="600" y="54" text-anchor="middle" class="flow-path-label" id="graphSubtitle">Waiting for the first packet</text>
+
+            <line id="edgeSourceAgent" x1="240" y1="140" x2="420" y2="140" class="flow-edge" marker-end="url(#arrowHead)"></line>
+            <line id="edgeAgentApi" x1="420" y1="140" x2="780" y2="140" class="flow-edge" marker-end="url(#arrowHead)"></line>
+            <line id="edgeApiDest" x1="780" y1="140" x2="960" y2="140" class="flow-edge" marker-end="url(#arrowHead)"></line>
+
+            <g class="flow-node" id="nodeSource">
+              <circle cx="170" cy="140" r="58"></circle>
+              <text x="170" y="132" text-anchor="middle" class="node-name" id="nodeSourceTitle">SOURCE</text>
+              <text x="170" y="156" text-anchor="middle" class="node-sub" id="nodeSourceValue">-</text>
+            </g>
+
+            <g class="flow-node active" id="nodeAgent">
+              <circle cx="420" cy="140" r="58"></circle>
+              <text x="420" y="132" text-anchor="middle" class="node-name">NET</text>
+              <text x="420" y="156" text-anchor="middle" class="node-sub">agent</text>
+            </g>
+
+            <g class="flow-node active" id="nodeApi">
+              <circle cx="780" cy="140" r="58"></circle>
+              <text x="780" y="132" text-anchor="middle" class="node-name">DISC</text>
+              <text x="780" y="156" text-anchor="middle" class="node-sub">api</text>
+            </g>
+
+            <g class="flow-node" id="nodeDest">
+              <circle cx="1030" cy="140" r="58"></circle>
+              <text x="1030" y="132" text-anchor="middle" class="node-name" id="nodeDestTitle">DEST</text>
+              <text x="1030" y="156" text-anchor="middle" class="node-sub" id="nodeDestValue">-</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
 <div class="toast-container position-fixed top-0 end-0 p-3">
   <div id="threatToast" class="toast text-bg-danger border-0">
     <div class="toast-body mono" id="toastMsg">IDS ALERT</div>
@@ -264,45 +570,114 @@
   const eventsBody = document.getElementById("eventsBody");
   const emptyRow  = document.getElementById("emptyRow");
   const toastMsg  = document.getElementById("toastMsg");
+  const graphSummary = document.getElementById("graphSummary");
+  const graphTitle = document.getElementById("graphTitle");
+  const graphSubtitle = document.getElementById("graphSubtitle");
+  const nodeSourceValue = document.getElementById("nodeSourceValue");
+  const nodeDestValue = document.getElementById("nodeDestValue");
+  const edgeIds = ["edgeSourceAgent", "edgeAgentApi", "edgeApiDest"];
+  const nodeIds = ["nodeSource", "nodeAgent", "nodeApi", "nodeDest"];
 
-  // flow_id -> <tr>
-  const rowByFlow = new Map();
+  let lastSignature = "";
 
-  function fmt(x){ return typeof x==="number" ? x.toFixed(4) : "-"; }
+  function fmt(x){ return typeof x === "number" ? x.toFixed(4) : "-"; }
+  function pct(x){ return `${Math.round((x ?? 0) * 100)}%`; }
+  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+  function fmtTime(ts){
+    return new Date(ts * 1000).toLocaleString([], {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
+  }
 
-  function statusOf(p0,p1,p2){
-    if(p2>p0 && p2 > p1) return "Integrity";
-    if(p1>p0) return "DoS";
+  function statusOf(p0, p1, p2){
+    if(p2 > p0 && p2 > p1) return "Integrity";
+    if(p1 > p0) return "DoS";
     return "NORMAL";
   }
 
   function flowIdOf(d){
-    // fallback: se manca flow_id, usa qualcosa di stabile (o "-" e non loggare)
     return d?.meta?.flow_id ?? "-";
   }
 
+  function parseFlowId(flowId){
+    const raw = String(flowId ?? "-");
+    const parts = raw.split("|");
+    if (parts.length >= 4){
+      return {
+        source: parts[0],
+        destination: parts[1],
+        proto: parts[2],
+        windowLabel: parts.slice(3).join("|"),
+      };
+    }
+    return {
+      source: raw,
+      destination: "-",
+      proto: "-",
+      windowLabel: "-",
+    };
+  }
+
+  function setGraph(status, flowId){
+    const parsed = parseFlowId(flowId);
+    const hasFlow = parsed.source !== "-" && parsed.destination !== "-";
+    const color = status === "DoS" ? "var(--err)" : status === "Integrity" ? "var(--warn)" : "var(--ok)";
+
+    graphSummary.textContent = hasFlow
+      ? `${parsed.source} → ${parsed.destination}`
+      : "Waiting for flow data";
+    graphTitle.textContent = hasFlow
+      ? `${parsed.source} → ${parsed.destination}`
+      : "Observed flow path";
+    graphSubtitle.textContent = hasFlow && parsed.proto !== "-"
+      ? `${parsed.proto} · ${parsed.windowLabel}`
+      : "Waiting for the first packet";
+    nodeSourceValue.textContent = hasFlow ? parsed.source : "-";
+    nodeDestValue.textContent = hasFlow ? parsed.destination : "-";
+
+    edgeIds.forEach((id) => {
+      const edge = document.getElementById(id);
+      edge.style.stroke = hasFlow ? color : "rgba(255,255,255,.28)";
+      edge.setAttribute("marker-end", hasFlow ? "url(#arrowHeadActive)" : "url(#arrowHead)");
+      edge.classList.toggle("active", hasFlow);
+    });
+    document.getElementById("nodeSource").classList.toggle("active", hasFlow);
+    document.getElementById("nodeDest").classList.toggle("active", hasFlow);
+    document.getElementById("nodeAgent").classList.add("active");
+    document.getElementById("nodeApi").classList.add("active");
+  }
+
   function badgeClass(status){
-    return status==="DoS" ? "badge-err" : status==="Integrity" ? "badge-warn" : "badge-ok";
+    return status === "DoS" ? "badge-err" : status === "Integrity" ? "badge-warn" : "badge-ok";
   }
 
   function setOnline(status){
-    const dot=document.getElementById("statusDot");
-    dot.style.background = status==="DoS" ? "var(--err)" : status==="Integrity" ? "var(--warn)" : "var(--ok)";
-    document.getElementById("status").textContent=status;
+    const dot = document.getElementById("statusDot");
+    const dotMini = document.getElementById("statusDotMini");
+    const statusText = document.getElementById("status");
+    const statusMini = document.getElementById("statusMini");
+    const statusDetail = document.getElementById("statusDetail");
+    const color = status === "DoS" ? "var(--err)" : status === "Integrity" ? "var(--warn)" : "var(--ok)";
+    dot.style.background = color;
+    dotMini.style.background = color;
+    statusText.textContent = status;
+    statusMini.textContent = status;
+    statusDetail.textContent = status === "NORMAL"
+      ? "Traffic looks stable"
+      : status === "Integrity"
+        ? "Integrity pattern dominating"
+        : "DoS pattern dominating";
   }
 
   function upsertEventRow({ isoTime, flowId, status, p0, p1, p2 }){
-    // se è la prima riga, rimuovi placeholder
     if (emptyRow) emptyRow.remove();
 
-    let tr = rowByFlow.get(flowId);
-
-    if(!tr){
-      tr = document.createElement("tr");
-      rowByFlow.set(flowId, tr);
-    }
-
-    // aggiorna contenuto
+    const tr = document.createElement("tr");
     tr.innerHTML = `
       <td class="mono">${isoTime}</td>
       <td class="mono">${flowId}</td>
@@ -310,55 +685,71 @@
       <td class="mono">${fmt(p0)} / ${fmt(p1)} / ${fmt(p2)}</td>
     `;
 
-    // animazione "pop" ad ogni update
-    tr.classList.remove("new-row");
-    void tr.offsetWidth; // reflow per ri-trigger animazione
-    tr.classList.add("new-row");
+    tr.classList.toggle("table-active", status !== "NORMAL");
+    tr.classList.toggle("opacity-75", status === "NORMAL");
 
-    // porta in cima (most recent on top)
+    tr.classList.add("new-row");
     eventsBody.prepend(tr);
+
+    while (eventsBody.children.length > 40) {
+      const lastRow = eventsBody.lastElementChild;
+      if (!lastRow || lastRow.id === "emptyRow") break;
+      lastRow.remove();
+    }
   }
 
   async function refresh(){
     try{
-      const r = await fetch("/api/last",{cache:"no-store"});
+      const r = await fetch("/api/last", {cache:"no-store"});
       const d = await r.json();
 
       const p0 = d.p0 ?? 1;
       const p1 = d.p1 ?? 0;
       const p2 = d.p2 ?? 0;
-      const status = statusOf(p0,p1,p2);
+      const status = statusOf(p0, p1, p2);
 
-      const isoTime = (d.ts ? new Date(d.ts*1000) : new Date()).toISOString();
-      const flowId  = flowIdOf(d);
+      const ts = d.ts ?? (Date.now() / 1000);
+      const isoTime = fmtTime(ts);
+      const flowId = flowIdOf(d);
+      const alertWeight = Math.max(p1, p2);
+      const confidence = clamp01(p0);
 
       document.getElementById("ts").textContent = isoTime;
       document.getElementById("flowId").textContent = flowId;
       document.getElementById("modelVersion").textContent = d.model_version ?? "-";
+      document.getElementById("flowScore").textContent = status;
+      document.getElementById("trafficLabel").textContent = status === "NORMAL" ? "Normal" : status;
+      document.getElementById("alertLabel").textContent = fmt(alertWeight);
+      document.getElementById("confidenceLabel").textContent = pct(confidence);
 
-      document.getElementById("p0v").textContent=fmt(p0);
-      document.getElementById("p1v").textContent=fmt(p1);
-      document.getElementById("p2v").textContent=fmt(p2);
+      document.getElementById("p0v").textContent = fmt(p0);
+      document.getElementById("p1v").textContent = fmt(p1);
+      document.getElementById("p2v").textContent = fmt(p2);
 
-      document.getElementById("p0b").style.width=(p0*100)+"%";
-      document.getElementById("p1b").style.width=(p1*100)+"%";
-      document.getElementById("p2b").style.width=(p2*100)+"%";
+      document.getElementById("p0b").style.width = `${clamp01(p0) * 100}%`;
+      document.getElementById("p1b").style.width = `${clamp01(p1) * 100}%`;
+      document.getElementById("p2b").style.width = `${clamp01(p2) * 100}%`;
 
       setOnline(status);
+      setGraph(status, flowId);
 
-      // logga SOLO se è warning/error (come prima)
-      if (flowId !== "-" && (p1>p0 || p2>p0)){
-        upsertEventRow({ isoTime, flowId, status, p0, p1, p2 });
-        toastMsg.textContent = `${status} | flow=${flowId}`;
-        toast.show();
+      const signature = flowId === "-" ? "no-data" : `${flowId}|${ts}|${p0}|${p1}|${p2}`;
+      if (signature !== lastSignature){
+        lastSignature = signature;
+        if (flowId !== "-"){
+          upsertEventRow({ isoTime, flowId, status, p0, p1, p2 });
+          if (status !== "NORMAL") {
+            toastMsg.textContent = `${status} | flow=${flowId}`;
+            toast.show();
+          }
+        }
       }
     }catch{
-      // silenzioso come prima
     }
   }
 
   refresh();
-  setInterval(refresh,1000);
+  setInterval(refresh, 1000);
 </script>
 </body>
 </html>

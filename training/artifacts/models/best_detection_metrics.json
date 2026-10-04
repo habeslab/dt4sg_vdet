@@ -1,0 +1,8 @@
+{
+  "epoch": 200,
+  "F1_maligno_val": 0.9997052755673446,
+  "precision_maligno_val": 1.0,
+  "recall_maligno_val": 0.9994107248084856,
+  "rFP_val": 0.05610795319080353,
+  "ACC_val": 0.9360795617103577
+}

@@ -1,0 +1,17 @@
+[
+  "flow total IEC104_S_Message packets",
+  "init bw window bytes",
+  "init fw window bytes",
+  "flow total IEC104_U_Message packets",
+  "flow ACK flag count",
+  "flow PSH flag count",
+  "total flow packets",
+  "bw total IEC104_U_Message packets",
+  "fw_subflow_bytes",
+  "fw_subflow_packets",
+  "flow packet APDU length var",
+  "fw IAT std",
+  "fw total IEC104_U_Message packets",
+  "total fw packets",
+  "fw packets APDU total length"
+]

@@ -1,0 +1,113 @@
+feature_name,importance_score
+flow total IEC104_S_Message packets,0.06501889489090185
+init bw window bytes,0.03601315865186522
+init fw window bytes,0.03371457542640217
+flow total IEC104_U_Message packets,0.030619552376582794
+flow ACK flag count,0.026722101252976412
+flow PSH flag count,0.024462937089813428
+total flow packets,0.024219317864418735
+bw total IEC104_U_Message packets,0.020928271694329197
+fw_subflow_bytes,0.018616362459859016
+fw_subflow_packets,0.018110379271998312
+flow packet APDU length var,0.017772304131613837
+fw IAT std,0.016875483103145954
+fw total IEC104_U_Message packets,0.014444815028757543
+total fw packets,0.014154091932213555
+fw packets APDU total length,0.013824366498125414
+bw total IEC104_S_Message packets,0.012299545447759777
+flow packet APDU length std,0.011259403036370616
+fw TCP total header length,0.010083670695497976
+fw PSH flag amount,0.0097915639692195
+flow packet APDU length mean,0.008209940057080603
+flow idle time variance,0.007730159818717283
+flow down/up ratio,0.006691906134136149
+flow idle time std,0.004517092943396667
+bw_subflow_bytes,0.004318794325512868
+fw total IEC104_S_Message packets,0.004206754549968089
+flow idle time max,0.003877997403178633
+fw IAT min,0.0036257920931787586
+bw packet APDU length mean,0.0035352042950302556
+bw total IEC104_I_Message_SingleIOA packets,0.0033838951699506647
+bw_subflow_packets,0.0027453575100658384
+fw iAT tot,0.0023062750936097475
+fw IAT max,0.0021588405744666084
+total bw packets,0.0019415372585573345
+flow active time mean,0.0018530094226517754
+bw iec104 bytes/s,0.001839380363652899
+fw IAT mean,0.001781315502388975
+flow IAT max,0.0016065854393045775
+bw iec104 packts/s,0.00158225949913922
+flow active time max,0.0015291466053356127
+bw PSH flag amount,0.0015182810155740924
+bw packet APDU length max,0.0014627091702728223
+bw TCP total header length,0.0012437947125081138
+fw packet APDU length std,0.0012114855388133648
+fw packet APDU length max,0.001148758660503259
+flow IAT tot,0.0011059323690598432
+fw packet APDU length mean,0.0010754262285846486
+bw IAT max,0.0010455636657259737
+flow active time min,0.0010342824048664627
+flow iec104 packts/s,0.0010283444530078268
+cot=3,0.0009310924569688524
+cot=6,0.0008879449283065352
+fw total IEC104_I_Message_SingleIOA packets,0.0008359613995611454
+flow active time variance,0.0008338099831665266
+bw packet APDU length var,0.0008082188265453626
+bw packet APDU length std,0.0006992208918214506
+bw IAT std,0.0006324002432214321
+flow packets APDU total length,0.0005781625946786504
+bw IAT std.1,0.0005322164695102946
+flow duration,0.0005026401043180385
+flow IAT mean,0.0005001381238761035
+flow active time std,0.0004667816907275185
+bw IAT tot,0.00037219528199414323
+bw packets APDU total length,0.0003691704517950128
+flow IAT std,0.0003358742351731951
+fw iec104 bytes/s,0.0003126342373532478
+flow idle time min,0.00028451023378744017
+type_id_system_information_in_control_direction,0.00026468366822117554
+fw iec104 packts/s,0.00025901558781965956
+type_id_process_information_in_monitor_direction,0.00023243782399130924
+flow total IEC104_I_Message_SingleIOA packets,0.0002017340011764605
+fw packet APDU length var,0.0002010147982123979
+cot=7,0.00013753336089615997
+flow idle time mean,0.00012007921835361572
+flow IAT min,0.00010115065832429494
+flow iec104 bytes/s,7.936289760166992e-05
+bw IAT min,7.132752126603701e-05
+type_id_process_information_in_control_direction,2.7458821954052378e-05
+cot=10,2.148671860083535e-05
+flow packet APDU length max,2.0519613946534204e-05
+cot=1,1.869227884927279e-05
+bw packet APDU length min,1.3670981001088571e-05
+bw IAT mean,5.642809709942238e-06
+flow packet APDU length min,0.0
+fw packet APDU length min,0.0
+flow ECE flag count,0.0
+flow CWE flag count,0.0
+flow SYN flag count,0.0
+bw total IEC104_I_Message_SeqIOA packets,0.0
+fw total IEC104_I_Message_SeqIOA packets,0.0
+flow total IEC104_I_Message_SeqIOA packets,0.0
+flow URG flag count,0.0
+flow RST flag count,0.0
+fw URG flag amount,0.0
+bw URG flag amount,0.0
+bw avg packets/bulk,0.0
+bw avg bytes/bulk,0.0
+cot=5,0.0
+cot=4,0.0
+cot=2,0.0
+fw avg bytes/bulk,0.0
+fw avg bulk rate,0.0
+bw avg bulk rate,0.0
+fw avg packets/bulk,0.0
+cot=8,0.0
+cot=13,0.0
+cot=12,0.0
+cot=11,0.0
+cot=9,0.0
+type_id_system_information_in_monitor_direction,0.0
+cot=20,0.0
+type_id_parameter_in_control_direction,0.0
+type_id_file_transfer,0.0

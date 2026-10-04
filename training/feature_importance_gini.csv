@@ -1,0 +1,115 @@
+,gini_importance
+bw IAT std.1,0.0
+src port,0.0
+cot=6,0.0
+cot=7,0.0
+cot=8,0.0
+cot=9,0.0
+cot=10,0.0
+cot=11,0.0
+cot=12,0.0
+cot=13,0.0
+flow active time std,0.0
+flow active time variance,0.0
+flow IAT max,0.0
+fw IAT max,0.0
+bw IAT max,0.0
+flow IAT min,0.0
+fw IAT min,0.0
+bw IAT min,0.0
+flow IAT mean,0.0
+fw IAT mean,0.0
+bw IAT mean,0.0
+flow IAT std,0.0
+fw IAT std,0.0
+bw IAT std,0.0
+flow IAT tot,0.0
+fw iAT tot,0.0
+bw IAT tot,0.0
+flow iec104 packts/s,0.0
+fw iec104 packts/s,0.0
+bw iec104 packts/s,0.0
+flow iec104 bytes/s,0.0
+fw iec104 bytes/s,0.0
+bw iec104 bytes/s,0.0
+flow packet APDU length max,0.0
+flow packet APDU length min,0.0
+flow packet APDU length mean,0.0
+flow packet APDU length std,0.0
+flow packet APDU length var,0.0
+fw packet APDU length max,0.0
+fw packet APDU length min,0.0
+fw packet APDU length mean,0.0
+fw packet APDU length std,0.0
+fw packet APDU length var,0.0
+bw packet APDU length max,0.0
+bw packet APDU length min,0.0
+bw packet APDU length mean,0.0
+bw packet APDU length std,0.0
+bw packet APDU length var,0.0
+total flow packets,0.0
+total fw packets,0.0
+total bw packets,0.0
+flow packets APDU total length,0.0
+fw packets APDU total length,0.0
+bw packets APDU total length,0.0
+flow duration,0.0
+flow down/up ratio,0.0
+flow total IEC104_I_Message_SeqIOA packets,0.0
+fw total IEC104_I_Message_SeqIOA packets,0.0
+bw total IEC104_I_Message_SeqIOA packets,0.0
+flow total IEC104_I_Message_SingleIOA packets,0.0
+fw total IEC104_I_Message_SingleIOA packets,0.0
+bw total IEC104_I_Message_SingleIOA packets,0.0
+flow total IEC104_S_Message packets,0.0
+fw total IEC104_S_Message packets,0.0
+bw total IEC104_S_Message packets,0.0
+flow total IEC104_U_Message packets,0.0
+fw total IEC104_U_Message packets,0.0
+bw total IEC104_U_Message packets,0.0
+fw URG flag amount,0.0
+fw PSH flag amount,0.0
+bw URG flag amount,0.0
+bw PSH flag amount,0.0
+flow SYN flag count,0.0
+flow RST flag count,0.0
+flow PSH flag count,0.0
+flow ACK flag count,0.0
+flow URG flag count,0.0
+flow CWE flag count,0.0
+flow ECE flag count,0.0
+fw_subflow_packets,0.0
+bw_subflow_packets,0.0
+fw_subflow_bytes,0.0
+bw_subflow_bytes,0.0
+fw avg bytes/bulk,0.0
+bw avg bytes/bulk,0.0
+fw avg bulk rate,0.0
+bw avg bulk rate,0.0
+fw avg packets/bulk,0.0
+bw avg packets/bulk,0.0
+init fw window bytes,0.0
+init bw window bytes,0.0
+fw TCP total header length,0.0
+bw TCP total header length,0.0
+cot=1,0.0
+cot=2,0.0
+cot=3,0.0
+cot=4,0.0
+cot=5,0.0
+cot=20,0.0
+type_id_process_information_in_monitor_direction,0.0
+type_id_process_information_in_control_direction,0.0
+type_id_system_information_in_monitor_direction,0.0
+type_id_system_information_in_control_direction,0.0
+type_id_parameter_in_control_direction,0.0
+type_id_file_transfer,0.0
+dst port,0.0
+flow idle time max,0.0
+flow idle time min,0.0
+flow idle time mean,0.0
+flow idle time std,0.0
+flow idle time variance,0.0
+flow active time max,0.0
+flow active time min,0.0
+flow active time mean,0.0
