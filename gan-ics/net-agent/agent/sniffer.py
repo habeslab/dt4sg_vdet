@@ -105,7 +105,9 @@ class _WindowAgg:
         "apdu_sumsq",
         # --- NEW: APDU total length forward ---
         "fw_apdu_sum",
-
+        # --- latency instrumentation: capture time of first/last packet in the window ---
+        "first_pkt_ts",
+        "last_pkt_ts",
     )
 
     def __init__(self) -> None:
@@ -139,6 +141,8 @@ class _WindowAgg:
         self.apdu_sumsq = 0.0
         # --- NEW: APDU total length forward ---
         self.fw_apdu_sum = 0
+        self.first_pkt_ts: Optional[float] = None
+        self.last_pkt_ts: Optional[float] = None
 
 
 class Sniffer:
@@ -228,6 +232,9 @@ class Sniffer:
                         self._windows[k] = agg
 
                     # Totali
+                    if agg.first_pkt_ts is None:
+                        agg.first_pkt_ts = ts
+                    agg.last_pkt_ts = ts
                     agg.total_flow_packets += 1
                     agg.bytes_total += pkt_len
 
@@ -380,6 +387,9 @@ class Sniffer:
                         "meta": {
                             "flow_id": flow_id,
                             "window_ts": self._t0 + w * WINDOW_SEC,
+                            "window_end_ts": self._t0 + (w + 1) * WINDOW_SEC,
+                            "first_pkt_ts": agg.first_pkt_ts,
+                            "last_pkt_ts": agg.last_pkt_ts,
                             "synthetic": False,
                             "mode": "sniff",
                             "timestamp": time.time(),
@@ -447,6 +457,9 @@ class Sniffer:
                 "meta": {
                     "flow_id": flow_id,
                     "window_ts": self._t0 + w * WINDOW_SEC,
+                    "window_end_ts": self._t0 + (w + 1) * WINDOW_SEC,
+                    "first_pkt_ts": agg.first_pkt_ts,
+                    "last_pkt_ts": agg.last_pkt_ts,
                     "synthetic": False,
                     "mode": "sniff",
                     "timestamp": time.time(),

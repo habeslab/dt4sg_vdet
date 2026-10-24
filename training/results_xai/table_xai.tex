@@ -1,0 +1,14 @@
+\begin{tabular}{llc}
+\toprule
+\textbf{Property} & \textbf{Metric} & \textbf{Value} \\
+\midrule
+Fidelity (SHAP (local)) & AOPC / flip@3 & 0.167 / 0.633 \\
+Fidelity (SHAP (global)) & AOPC / flip@3 & 0.181 / 0.637 \\
+Fidelity (Random) & AOPC / flip@3 & 0.333 / 0.187 \\
+Stability (background, 5 samples) & Spearman / top-3 Jaccard & 0.975 / 0.917 \\
+Stability (model, 10 seeds) & Spearman / top-3 Jaccard & 0.843 / 0.841 \\
+Stability (input noise, $\epsilon=0.01\sigma$) & top-3 Jaccard & 0.860 \\
+Additivity & mean abs. error & 1.4e-08 \\
+Cost & latency per flow (median / p95) & 52.3 / 83.2 ms \\
+\bottomrule
+\end{tabular}

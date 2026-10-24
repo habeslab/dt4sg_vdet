@@ -272,6 +272,31 @@
       color: #fecdd3;
     }
 
+    .xai-row{
+      display:grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 3fr) 4.5rem;
+      gap:.75rem;
+      align-items:center;
+      padding:.35rem 0;
+      border-bottom:1px solid var(--border);
+    }
+    .xai-row:last-child{ border-bottom:0; }
+    .xai-feat{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .xai-axis{
+      position:relative;
+      height:12px;
+      border-radius:999px;
+      background:var(--barbg);
+    }
+    .xai-axis::before{
+      content:"";
+      position:absolute; left:50%; top:-3px; bottom:-3px;
+      width:1px; background:rgba(255,255,255,.35);
+    }
+    .xai-axis>div{ position:absolute; top:0; height:100%; border-radius:999px; }
+    .xai-pos{ left:50%; background:linear-gradient(90deg,var(--err),#fda4af); }
+    .xai-neg{ right:50%; background:linear-gradient(270deg,var(--ok),#86efac); }
+    .xai-hist{ max-height: 15rem; overflow:auto; }
     .hfill{
       min-height: calc(100vh - 170px);
     }
@@ -501,6 +526,42 @@
 
   <div class="row g-3 mt-1">
     <div class="col-12">
+      <div class="card p-4">
+        <div class="panel-head mb-3">
+          <div>
+            <div class="eyebrow mb-1">Explanation phase</div>
+            <h5 class="mb-0">Diagnostic report (SHAP)</h5>
+          </div>
+          <div class="muted small mono" id="xaiSummary">Waiting for the first malicious flow</div>
+        </div>
+        <div class="row g-4">
+          <div class="col-lg-7">
+            <div class="muted small mb-2">
+              Feature contributions to the predicted class of the latest alert
+              (<span style="color:var(--err)">towards</span> / <span style="color:var(--ok)">against</span>).
+            </div>
+            <div id="xaiBars"><div class="muted small py-3">No explanation yet.</div></div>
+          </div>
+          <div class="col-lg-5">
+            <div class="muted small mb-2">Recent diagnostic reports</div>
+            <div class="scrollbox xai-hist">
+              <table class="table table-sm align-middle mb-0">
+                <thead>
+                  <tr><th>Flow</th><th>Type</th><th>Top feature</th><th>XAI</th></tr>
+                </thead>
+                <tbody id="xaiBody">
+                  <tr><td colspan="4" class="muted py-3">No reports yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-12">
       <div class="card p-4 flow-card">
         <div class="panel-head mb-3">
           <div>
@@ -712,7 +773,7 @@
       const isoTime = fmtTime(ts);
       const flowId = flowIdOf(d);
       const alertWeight = Math.max(p1, p2);
-      const confidence = clamp01(p0);
+      const confidence = clamp01(Math.max(p0, p1, p2));  // probability of the predicted class
 
       document.getElementById("ts").textContent = isoTime;
       document.getElementById("flowId").textContent = flowId;
@@ -748,8 +809,66 @@
     }
   }
 
+  const CLASS_NAMES = {"1": "DoS", "2": "Integrity"};
+  let lastXaiId = "";
+
+  function esc(x){
+    return String(x ?? "-").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+
+  function renderXai(reports){
+    if (!reports.length) return;
+    const latest = reports[0];
+    const chi = latest.chi || {};
+    const top = chi.top || [];
+    const status = CLASS_NAMES[String(chi.class)] || "-";
+    const lat = latest.latency || {};
+
+    if (latest.alert_id !== lastXaiId){
+      lastXaiId = latest.alert_id;
+      const scale = Math.max(1e-9, ...top.map((t) => Math.abs(t.shap)));
+      document.getElementById("xaiBars").innerHTML = top.map((t) => {
+        const w = Math.abs(t.shap) / scale * 50;
+        const cls = t.shap >= 0 ? "xai-pos" : "xai-neg";
+        return `
+          <div class="xai-row">
+            <div class="xai-feat mono small" title="${esc(t.feature)} = ${esc(t.value)}">${esc(t.feature)}
+              <span class="muted">= ${typeof t.value === "number" ? +t.value.toPrecision(4) : "-"}</span></div>
+            <div class="xai-axis"><div class="${cls}" style="width:${w}%"></div></div>
+            <div class="mono small text-end">${t.shap >= 0 ? "+" : ""}${t.shap.toFixed(3)}</div>
+          </div>`;
+      }).join("");
+    }
+
+    document.getElementById("xaiSummary").textContent =
+      `${status} · base ${fmt(chi.base_value)} · explanation +${Math.round(lat.pred_to_explanation ?? 0)} ms`;
+
+    document.getElementById("xaiBody").innerHTML = reports.map((r) => {
+      const c = r.chi || {};
+      const st = CLASS_NAMES[String(c.class)] || "-";
+      const f = (c.top || [])[0];
+      return `
+        <tr>
+          <td class="mono small" title="${esc(r.flow_id)}">${r.flow_id ? esc(parseFlowId(r.flow_id).source + " → " + parseFlowId(r.flow_id).destination) : esc(r.alert_id.slice(0, 8))}</td>
+          <td><span class="badge ${badgeClass(st)}">${st}</span></td>
+          <td class="mono small">${f ? esc(f.feature) : "-"}</td>
+          <td class="mono small text-nowrap">${Math.round(r.latency?.pred_to_explanation ?? 0)} ms</td>
+        </tr>`;
+    }).join("");
+  }
+
+  async function refreshXai(){
+    try{
+      const r = await fetch("/api/explanations?limit=15", {cache:"no-store"});
+      renderXai(await r.json());
+    }catch{
+    }
+  }
+
   refresh();
   setInterval(refresh, 1000);
+  refreshXai();
+  setInterval(refreshXai, 1000);
 </script>
 </body>
 </html>

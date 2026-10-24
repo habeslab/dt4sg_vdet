@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import json
 import time
+import uuid
 import logging
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
@@ -52,6 +53,13 @@ CLASS_ORDER_ENV = os.getenv("CLASS_ORDER", "0,1,2")
 
 PRED_CSV_PATH = os.getenv("PRED_CSV_PATH", f"{ARTIFACTS_DIR}/predictions_log_experiment_{EXPERIMENT}.csv")
 
+# XAI (explanation phase): SHAP asincrono sui flussi classificati come malevoli
+XAI_ENABLED = os.getenv("XAI_ENABLED", "1") not in ("0", "false", "False", "")
+SHAP_BG_PATH = os.getenv("SHAP_BG_PATH", f"{ARTIFACTS_DIR}/shap_background.csv")
+XAI_TOP_K = int(os.getenv("XAI_TOP_K", "5"))
+XAI_WORKERS = int(os.getenv("XAI_WORKERS", "1"))
+XAI_LOG_PATH = os.getenv("XAI_LOG_PATH", f"{ARTIFACTS_DIR}/explanations_log_experiment_{EXPERIMENT}.jsonl")
+
 # =========================
 # Util: features.json loader
 # =========================
@@ -92,6 +100,10 @@ def _startup_load() -> None:
 
     feats_order = _load_features_order(FEATS_PATH)
     model = _load_pickle(MODEL_PATH)
+    # inferenza su un flusso alla volta: n_jobs=-1 (come salvato in training) avvia un thread
+    # per core a ogni richiesta (~56 ms vs ~9 ms con n_jobs=1 su 300 alberi); predizioni identiche
+    if hasattr(model, "n_jobs"):
+        model.n_jobs = int(os.getenv("RF_N_JOBS", "1"))
 
 
     # classi del modello (sklearn): model.classes_
@@ -134,7 +146,18 @@ def _startup_load() -> None:
         "classes_": model_classes,
         "class_index": idx_map,  # canon -> idx proba
         "class_order": desired,
+        "explainer": None,
     })
+
+    if XAI_ENABLED:
+        from app.xai import AsyncExplainer
+        explainer = AsyncExplainer(
+            model, feats_order, idx_map, SHAP_BG_PATH,
+            top_k=XAI_TOP_K, workers=XAI_WORKERS, log_path=XAI_LOG_PATH,
+        )
+        warm_ms = explainer.warmup(pd.DataFrame([[0.0] * len(feats_order)], columns=feats_order))
+        STATE["explainer"] = explainer
+        logger.info("XAI enabled: SHAP %s, top_k=%d, warm-up %.1f ms", explainer.mode, XAI_TOP_K, warm_ms)
 
 def _append_prediction_csv(
     csv_path: str,
@@ -200,17 +223,12 @@ def healthz():
         "features_order": STATE["features_order"],
         "model_version": STATE["model_version"],
         "classes_": STATE["classes_"],
-        "class_index": STATE["class_index"]
+        "class_index": STATE["class_index"],
+        "xai": STATE["explainer"].mode if STATE["explainer"] else "disabled",
     }
 
-@app.post("/predict3")
-def predict3(payload: Dict[str, object]):
-    feats: Dict[str, object] = (payload or {}).get("features") or {}  # type: ignore[assignment]
-    meta: Dict[str, object]  = (payload or {}).get("meta") or {}
 
-    feats_order: List[str] = STATE["features_order"]  # type: ignore[assignment]
-
-    # --- missing features check ---
+def _build_row(feats: Dict[str, object], feats_order: List[str]) -> pd.DataFrame:
     missing = [f for f in feats_order if f not in feats]
     if missing:
         raise HTTPException(status_code=422, detail={
@@ -219,11 +237,18 @@ def predict3(payload: Dict[str, object]):
             "missing_count": len(missing),
             "required_order": feats_order
         })
-
-    # --- build X row ---
     x_df = pd.DataFrame([{f: _as_float(feats[f]) for f in feats_order}], columns=feats_order)
-    
-    x_df = x_df.replace([np.inf, -np.inf], np.nan).fillna(0.0)
+    return x_df.replace([np.inf, -np.inf], np.nan).fillna(0.0)
+
+@app.post("/predict3")
+def predict3(payload: Dict[str, object]):
+    feats: Dict[str, object] = (payload or {}).get("features") or {}  # type: ignore[assignment]
+    meta: Dict[str, object]  = (payload or {}).get("meta") or {}
+
+    feats_order: List[str] = STATE["features_order"]  # type: ignore[assignment]
+
+    # --- build X row (422 if features are missing) ---
+    x_df = _build_row(feats, feats_order)
 
     probs_raw = STATE["model"].predict_proba(x_df)[0]
 
@@ -258,10 +283,52 @@ def predict3(payload: Dict[str, object]):
     except Exception as e:
         logger.exception("Failed to append prediction to CSV: %s", e)
 
+    # --- fast-path alert + explanation phase (asincrona, solo per flussi malevoli) ---
+    pred_class = str(int(np.argmax([p0, p1, p2])))
+    alert_id = uuid.uuid4().hex
+    t_pred = time.time()
+    explainer = STATE["explainer"]
+    if pred_class == "0":
+        xai_status = "not_required"
+    elif explainer is None:
+        xai_status = "disabled"
+    else:
+        explainer.submit(alert_id, x_df, pred_class, t_pred, meta)
+        xai_status = "pending"
+
     return JSONResponse({
-        "ts": time.time(),
+        "ts": t_pred,
         "features_order": feats_order,
         "p0": p0, "p1": p1, "p2": p2,
+        "pred_class": int(pred_class),
+        "alert_id": alert_id,
+        "xai": xai_status,
         "model_version": STATE["model_version"],
         "meta": meta,
     })
+
+@app.get("/explain/{alert_id}")
+def get_explanation(alert_id: str):
+    """Diagnostic report of an alert: 200 when ready, 202 while pending, 404 if unknown/expired."""
+    explainer = STATE["explainer"]
+    if explainer is None:
+        raise HTTPException(status_code=404, detail="xai disabled")
+    res = explainer.get(alert_id)
+    if res is None:
+        raise HTTPException(status_code=404, detail="unknown alert_id")
+    return JSONResponse(res, status_code=202 if res.get("status") == "pending" else 200)
+
+@app.post("/explain")
+def explain_sync(payload: Dict[str, object]):
+    """Synchronous explanation of a feature vector (predicted class, or `class` if given)."""
+    explainer = STATE["explainer"]
+    if explainer is None:
+        raise HTTPException(status_code=404, detail="xai disabled")
+    feats: Dict[str, object] = (payload or {}).get("features") or {}  # type: ignore[assignment]
+    x_df = _build_row(feats, STATE["features_order"])  # type: ignore[arg-type]
+    cls = payload.get("class")
+    if cls is None:
+        probs = STATE["model"].predict_proba(x_df)[0]
+        idx = STATE["class_index"]
+        cls = int(np.argmax([probs[idx[c]] for c in ("0", "1", "2")]))
+    return JSONResponse(explainer.explain(x_df, str(cls)))

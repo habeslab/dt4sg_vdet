@@ -15,6 +15,9 @@ services:
       LOG_LEVEL: "DEBUG"
       MGMT_DHCP: "0"
       MODEL_VERSION: "1.0.0"
+      XAI_ENABLED: "1"
+      XAI_TOP_K: "5"
+      XAI_WORKERS: "1"
     cap_add: ["NET_ADMIN"]
     volumes:
       - ./out_pipeline:/out_pipeline:ro
@@ -22,6 +25,7 @@ services:
       - ./out_pipeline/artifacts/rf_model.pkl:/artifacts/rf_model.pkl:ro
       - ./out_pipeline/artifacts/features_three.json:/artifacts/features.json:ro
       - ./out_pipeline/artifacts/rf_model_three.pkl:/artifacts/rf_model_three.pkl:ro
+      - ./out_pipeline/artifacts/shap_background.csv:/artifacts/shap_background.csv:ro
     networks:
       - mgmt
     ports:

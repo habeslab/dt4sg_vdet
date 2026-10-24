@@ -1,0 +1,18 @@
+# Environment for train_eval.py and the training notebooks.
+# Target machine: Ubuntu 26.04, NVIDIA RTX A6000, driver 580 (CUDA 13.0).
+# Python 3.10 (same as the original training host, 3.10.13).
+#
+#   python3.10 -m venv .venv
+#   .venv/bin/pip install -r requirements.txt
+#
+# scikit-learn is pinned to the version used to pickle rf_model_three.pkl
+# and by gan-ics/disc-api, so saved models load identically.
+numpy>=1.26,<2.0
+pandas>=2.2,<2.3
+scikit-learn==1.6.1
+joblib>=1.3,<2.0
+# pip wheels bundle CUDA 12 support; driver 580 is backward compatible
+xgboost>=3.0,<3.1
+shap>=0.46,<0.47
+matplotlib>=3.9,<3.10
+pyarrow>=17,<20

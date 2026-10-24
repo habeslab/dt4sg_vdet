@@ -21,6 +21,7 @@ COPY out_pipeline/artifacts/scaler.pkl     /artifacts/scaler.pkl
 COPY out_pipeline/artifacts/rf_model.pkl        /artifacts/rf_model.pkl
 COPY out_pipeline/artifacts/rf_model_three.pkl        /artifacts/rf_model_three.pkl
 COPY out_pipeline/artifacts/features_three.json  /artifacts/features_three.json
+COPY out_pipeline/artifacts/shap_background.csv  /artifacts/shap_background.csv
 
 RUN pip install -r /app/requirements.txt
 

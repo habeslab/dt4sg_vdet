@@ -15,3 +15,5 @@ merged_network_flow_leayer.csv
 .ipynb_checkpoints/
 checkpoints
 logs
+# Local Python environment
+.venv/
